@@ -67,6 +67,13 @@ describe('Tokens', function () {
           /option validity/)
       })
     })
+
+    describe('userInfo', function () {
+      it('should reject non-booleans', function () {
+        assert.throws(Tokens.bind(null, { userInfo: 'bogus' }),
+          /option userInfo/)
+      })
+    })
   })
 
   describe('.create(secret)', function () {
@@ -282,6 +289,47 @@ describe('Tokens', function () {
       var token = this.tokens.create(this.secret)
       token = token.substring(token.indexOf('-') + 1)
       assert.ok(!this.tokens.verify(this.secret, token))
+    })
+  })
+
+  describe('.create() and verify() with user info', function () {
+    before(function () {
+      this.tokens = new Tokens({
+        userInfo: true
+      })
+      this.secret = this.tokens.secretSync()
+    })
+
+    it('should return `true` with valid tokens', function () {
+      var token = this.tokens.create(this.secret, 'foobar')
+      assert.ok(this.tokens.verify(this.secret, token, 'foobar'))
+    })
+
+    it('should return `false` if userInfo does not match', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token, 'foobar'))
+    })
+
+    it('should return `false` if userInfo is not set in verify', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token))
+    })
+
+    it('should return `false` if userInfo is not a string in verify', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token, {}))
+    })
+
+    it('should reject undefined string userInfo (create)', function () {
+      assert.throws(function () {
+        this.tokens.create(this.secret)
+      }.bind(this), /argument userInfo.*required/)
+    })
+
+    it('should return `false` for tokens with no userInfo', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      token = token.substring(token.indexOf('-') + 1)
+      assert.ok(!this.tokens.verify(this.secret, token, 'foo'))
     })
   })
 })
