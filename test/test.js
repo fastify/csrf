@@ -227,4 +227,38 @@ describe('Tokens', function () {
       assert(!this.tokens.verify(this.secret, 'hi'))
     })
   })
+
+  describe('.create() and verify() with validity', function () {
+    before(function () {
+      this.tokens = new Tokens({
+        validity: 60 * 60
+      })
+      this.secret = this.tokens.secretSync()
+    })
+
+    it('should return `true` with valid tokens', function () {
+      var token = this.tokens.create(this.secret)
+      assert.ok(this.tokens.verify(this.secret, token))
+    })
+
+    it('should return `false` if current time is outside the validity interval', function () {
+      var token = this.tokens.create(this.secret)
+      var now = Date.now()
+      var fn = Date.now
+      Date.now = function () { return now + 1 + 60 * 60 }
+      var valid = this.tokens.verify(this.secret, token)
+      Date.now = fn
+      assert.ok(!valid)
+    })
+
+    it('should return `true` if current time is at the max of the validity interval', function () {
+      var token = this.tokens.create(this.secret)
+      var now = Date.now()
+      var fn = Date.now
+      Date.now = function () { return now + 60 * 60 }
+      var valid = this.tokens.verify(this.secret, token)
+      Date.now = fn
+      assert.ok(valid)
+    })
+  })
 })
