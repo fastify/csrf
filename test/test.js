@@ -50,6 +50,23 @@ describe('Tokens', function () {
         assert.strictEqual(Tokens({ secretLength: 4 }).secretSync().length, 6)
       })
     })
+
+    describe('validity', function () {
+      it('should reject non-numbers', function () {
+        assert.throws(Tokens.bind(null, { validity: 'bogus' }),
+          /option validity/)
+      })
+
+      it('should reject NaN', function () {
+        assert.throws(Tokens.bind(null, { validity: NaN }),
+          /option validity/)
+      })
+
+      it('should reject Infinity', function () {
+        assert.throws(Tokens.bind(null, { validity: Infinity }),
+          /option validity/)
+      })
+    })
   })
 
   describe('.create(secret)', function () {

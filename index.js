@@ -66,15 +66,17 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
-  var validity = opts.validity || 0
+  var validity = opts.validity !== undefined
+    ? opts.validity
+    : 0
 
   if (typeof validity !== 'number' || !isFinite(validity) || validity < 0) {
     throw new TypeError('option validity must be finite number > 0')
   }
 
-  this.validity = validity
   this.saltLength = saltLength
   this.secretLength = secretLength
+  this.validity = validity
 }
 
 /**
