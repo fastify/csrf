@@ -260,5 +260,11 @@ describe('Tokens', function () {
       Date.now = fn
       assert.ok(valid)
     })
+
+    it('should return `false` for tokens with no date', function () {
+      var token = this.tokens.create(this.secret)
+      token = token.substring(token.indexOf('-') + 1)
+      assert.ok(!this.tokens.verify(this.secret, token))
+    })
   })
 })
