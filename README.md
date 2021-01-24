@@ -59,12 +59,17 @@ The length of the secret to generate, in bytes. Note that the secret is
 passed around base-64 encoded and that this length refers to the underlying
 bytes, not the length of the base-64 string. Defaults to `18` bytes.
 
+##### userInfo
+
+Require user-specific information in `tokens.create()` and
+`tokens.verify()`.
+
 ##### validity
 
 The maximum validity of the token to generate, in milliseconds. Note that the epoch  is
 passed around base-36 encoded. Defaults to `0` milliseconds (disabled).
 
-#### tokens.create(secret)
+#### tokens.create(secret[, userInfo])
 
 Create a new CSRF token attached to the given `secret`. The `secret` is a
 string, typically generated from the `tokens.secret()` or `tokens.secretSync()`
@@ -77,6 +82,12 @@ expect the user's browser to provide back.
 var secret = tokens.secretSync()
 var token = tokens.create(secret)
 ```
+
+The `userInfo` parameter can be used to protect against cookie tossing
+attacks (and similar) when the application is deployed with untrusted
+subdomains. It will encode some user-specific information within the
+token. It is used only if `userInfo: true`  is passed as option in the
+constructor.
 
 #### tokens.secret(callback)
 
@@ -120,7 +131,7 @@ A synchronous version of `tokens.secret(callback)`. Please see
 var secret = tokens.secretSync()
 ```
 
-#### tokens.verify(secret, token)
+#### tokens.verify(secret, token[, userInfo])
 
 Check whether a CSRF token is valid for the given `secret`, returning
 a Boolean.
@@ -132,6 +143,10 @@ if (!tokens.verify(secret, token)) {
   throw new Error('invalid token!')
 }
 ```
+
+The `userInfo` paramater is required if `userInfo: true` was configured
+during initialization. The user-specific information must match what was
+passed in `tokens.create()`.
 
 ## License
 

@@ -41,6 +41,7 @@ module.exports = Tokens
  * @param {number} [options.saltLength=8] The string length of the salt
  * @param {number} [options.secretLength=18] The byte length of the secret key
  * @param {number} [options.validity=0] The maximum milliseconds of validity of this token. 0 disables the check.
+ * @param {boolean} [options.userInfo=false] Require userInfo on create() and verify()
  * @public
  */
 
@@ -132,7 +133,7 @@ Tokens.prototype.secretSync = function secretSync () {
 }
 
 /**
- * Tokenize a secret and salt.
+ * Tokenize a secret, salt, date and userInfo.
  * @private
  */
 
@@ -159,6 +160,7 @@ Tokens.prototype._tokenize = function tokenize (secret, salt, date, userInfo) {
  *
  * @param {string} secret
  * @param {string} token
+ * @param {string} userInfo
  * @public
  */
 
