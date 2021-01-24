@@ -39,6 +39,7 @@ module.exports = Tokens
  * @param {object} [options]
  * @param {number} [options.saltLength=8] The string length of the salt
  * @param {number} [options.secretLength=18] The byte length of the secret key
+ * @param {number} [options.validity=0] The maximum milliseconds of validity of this token. 0 disables the check.
  * @public
  */
 
