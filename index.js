@@ -65,6 +65,13 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
+  var validity = opts.validity || 0
+
+  if (typeof validity !== 'number' || !isFinite(validity) || validity < 0) {
+    throw new TypeError('option validity must be finite number > 0')
+  }
+
+  this.validity = validity
   this.saltLength = saltLength
   this.secretLength = secretLength
 }
@@ -80,8 +87,9 @@ Tokens.prototype.create = function create (secret) {
   if (!secret || typeof secret !== 'string') {
     throw new TypeError('argument secret is required')
   }
+  var date = this.validity > 0 ? Date.now() : null
 
-  return this._tokenize(secret, rndm(this.saltLength))
+  return this._tokenize(secret, rndm(this.saltLength), date)
 }
 
 /**
@@ -109,8 +117,14 @@ Tokens.prototype.secretSync = function secretSync () {
  * @private
  */
 
-Tokens.prototype._tokenize = function tokenize (secret, salt) {
-  return salt + '-' + hash(salt + '-' + secret)
+Tokens.prototype._tokenize = function tokenize (secret, salt, date) {
+  var toHash = ''
+
+  if (date !== null) {
+    toHash += date + '-' + salt
+  }
+
+  return toHash + '-' + hash(toHash + '-' + secret)
 }
 
 /**
@@ -131,15 +145,28 @@ Tokens.prototype.verify = function verify (secret, token) {
   }
 
   var index = token.indexOf('-')
+  var toCompare = token
+  var date = null
 
   if (index === -1) {
     return false
   }
 
-  var salt = token.substr(0, index)
-  var expected = this._tokenize(secret, salt)
+  if (this.validity > 0) {
+    date = parseInt(token.substr(0, index))
 
-  return compare(token, expected)
+    if (Date.now() - date > this.validity) {
+      return false
+    }
+
+    token = token.substr(index + 1)
+    index = token.indexOf('-')
+  }
+
+  var salt = token.substr(0, index)
+  var expected = this._tokenize(secret, salt, date)
+
+  return compare(toCompare, expected)
 }
 
 /**
