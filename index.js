@@ -121,7 +121,7 @@ Tokens.prototype._tokenize = function tokenize (secret, salt, date) {
   var toHash = ''
 
   if (date !== null) {
-    toHash += date + '-' + salt
+    toHash += date.toString(36) + '-' + salt
   }
 
   return toHash + '-' + hash(toHash + '-' + secret)
@@ -153,7 +153,7 @@ Tokens.prototype.verify = function verify (secret, token) {
   }
 
   if (this.validity > 0) {
-    date = parseInt(token.substr(0, index))
+    date = parseInt(token.substr(0, index), 36)
 
     if (Date.now() - date > this.validity) {
       return false
