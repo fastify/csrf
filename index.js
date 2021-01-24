@@ -161,6 +161,10 @@ Tokens.prototype.verify = function verify (secret, token) {
 
     token = token.substr(index + 1)
     index = token.indexOf('-')
+
+    if (index === -1) {
+      return false
+    }
   }
 
   var salt = token.substr(0, index)
