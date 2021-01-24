@@ -124,8 +124,10 @@ Tokens.prototype._tokenize = function tokenize (secret, salt, date) {
   var toHash = ''
 
   if (date !== null) {
-    toHash += date.toString(36) + '-' + salt
+    toHash += date.toString(36) + '-'
   }
+
+  toHash += salt
 
   return toHash + '-' + hash(toHash + '-' + secret)
 }
