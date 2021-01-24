@@ -59,6 +59,11 @@ The length of the secret to generate, in bytes. Note that the secret is
 passed around base-64 encoded and that this length refers to the underlying
 bytes, not the length of the base-64 string. Defaults to `18` bytes.
 
+##### validity
+
+The maximum validity of the token to generate, in milliseconds. Note that the epoch  is
+passed around base-36 encoded. Defaults to `0` milliseconds (disabled).
+
 #### tokens.create(secret)
 
 Create a new CSRF token attached to the given `secret`. The `secret` is a
