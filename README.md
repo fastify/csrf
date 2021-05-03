@@ -1,11 +1,5 @@
 # CSRF
 
-[![NPM Version][npm-version-image]][npm-url]
-[![NPM Downloads][npm-downloads-image]][npm-url]
-[![Node.js Version][node-image]][node-url]
-[![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
-
 Logic behind CSRF token creation and verification.
 
 Read [Understanding-CSRF](https://github.com/pillarjs/understanding-csrf)
@@ -19,10 +13,12 @@ module?
   * Koa: [koa-csrf](https://www.npmjs.com/package/koa-csrf) or
     [koa-atomic-session](https://www.npmjs.com/package/koa-atomic-session)
 
+This module is a fork of https://github.com/pillarjs/csrf at f0d66c91ea4be6d30a03bd311ed9518951d9c3e4.
+
 ### Install
 
 ```sh
-$ npm install csrf
+$ npm install @fastify/csrf
 ```
 
 ### TypeScript
@@ -36,7 +32,7 @@ information for TypeScript projects.
 <!-- eslint-disable no-unused-vars -->
 
 ```js
-var Tokens = require('csrf')
+var Tokens = require('@fastify/csrf')
 ```
 
 ### new Tokens([options])
@@ -131,13 +127,3 @@ if (!tokens.verify(secret, token)) {
 ## License
 
 [MIT](LICENSE)
-
-[coveralls-image]: https://badgen.net/coveralls/c/github/pillarjs/csrf/master
-[coveralls-url]: https://coveralls.io/r/pillarjs/csrf?branch=master
-[node-image]: https://badgen.net/npm/node/csrf
-[node-url]: https://nodejs.org/en/download
-[npm-downloads-image]: https://badgen.net/npm/dm/csrf
-[npm-url]: https://npmjs.org/package/csrf
-[npm-version-image]: https://badgen.net/npm/v/csrf
-[travis-image]: https://badgen.net/travis/pillarjs/csrf/master
-[travis-url]: https://travis-ci.org/pillarjs/csrf
