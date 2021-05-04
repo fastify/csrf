@@ -68,7 +68,7 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
-  var validity = opts.validity !== undefined
+  var validity = Number.isInteger(opts.validity) === true
     ? opts.validity
     : 0
 
@@ -105,7 +105,7 @@ Tokens.prototype.create = function create (secret, userInfo) {
 
   if (this.userInfo) {
     if (typeof userInfo !== 'string') {
-      throw new TypeError('argument userInfo is required')
+      throw new TypeError('argument userInfo is required to be a string')
     }
   }
 
@@ -198,7 +198,7 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   }
 
   if (this.userInfo) {
-    // validate the optiona argument, it is required
+    // validate the optional argument, it is required
     // only if this.userInfo is true
     if (!userInfo || typeof userInfo !== 'string') {
       return false
