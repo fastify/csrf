@@ -105,7 +105,7 @@ Tokens.prototype.create = function create (secret, userInfo) {
 
   if (this.userInfo) {
     if (typeof userInfo !== 'string') {
-      throw new TypeError('argument userInfo is required')
+      throw new TypeError('argument userInfo is required to be a string')
     }
   }
 
