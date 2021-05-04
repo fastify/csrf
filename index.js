@@ -68,7 +68,7 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
-  var validity = Number.isInteger(opts.validity) === true
+  var validity = opts.validity !== undefined
     ? opts.validity
     : 0
 
