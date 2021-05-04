@@ -50,6 +50,30 @@ describe('Tokens', function () {
         assert.strictEqual(Tokens({ secretLength: 4 }).secretSync().length, 6)
       })
     })
+
+    describe('validity', function () {
+      it('should reject non-numbers', function () {
+        assert.throws(Tokens.bind(null, { validity: 'bogus' }),
+          /option validity/)
+      })
+
+      it('should reject NaN', function () {
+        assert.throws(Tokens.bind(null, { validity: NaN }),
+          /option validity/)
+      })
+
+      it('should reject Infinity', function () {
+        assert.throws(Tokens.bind(null, { validity: Infinity }),
+          /option validity/)
+      })
+    })
+
+    describe('userInfo', function () {
+      it('should reject non-booleans', function () {
+        assert.throws(Tokens.bind(null, { userInfo: 'bogus' }),
+          /option userInfo/)
+      })
+    })
   })
 
   describe('.create(secret)', function () {
@@ -225,6 +249,87 @@ describe('Tokens', function () {
       assert(!this.tokens.verify(this.secret, undefined))
       assert(!this.tokens.verify(this.secret, []))
       assert(!this.tokens.verify(this.secret, 'hi'))
+    })
+  })
+
+  describe('.create() and verify() with validity', function () {
+    before(function () {
+      this.tokens = new Tokens({
+        validity: 60 * 60
+      })
+      this.secret = this.tokens.secretSync()
+    })
+
+    it('should return `true` with valid tokens', function () {
+      var token = this.tokens.create(this.secret)
+      assert.ok(this.tokens.verify(this.secret, token))
+    })
+
+    it('should return `false` if current time is outside the validity interval', function () {
+      var token = this.tokens.create(this.secret)
+      var now = Date.now()
+      var fn = Date.now
+      Date.now = function () { return now + 1 + 60 * 60 }
+      var valid = this.tokens.verify(this.secret, token)
+      Date.now = fn
+      assert.ok(!valid)
+    })
+
+    it('should return `true` if current time is at the max of the validity interval', function () {
+      var token = this.tokens.create(this.secret)
+      var now = Date.now()
+      var fn = Date.now
+      Date.now = function () { return now + 60 * 60 }
+      var valid = this.tokens.verify(this.secret, token)
+      Date.now = fn
+      assert.ok(valid)
+    })
+
+    it('should return `false` for tokens with no date', function () {
+      var token = this.tokens.create(this.secret)
+      token = token.substring(token.indexOf('-') + 1)
+      assert.ok(!this.tokens.verify(this.secret, token))
+    })
+  })
+
+  describe('.create() and verify() with user info', function () {
+    before(function () {
+      this.tokens = new Tokens({
+        userInfo: true
+      })
+      this.secret = this.tokens.secretSync()
+    })
+
+    it('should return `true` with valid tokens', function () {
+      var token = this.tokens.create(this.secret, 'foobar')
+      assert.ok(this.tokens.verify(this.secret, token, 'foobar'))
+    })
+
+    it('should return `false` if userInfo does not match', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token, 'foobar'))
+    })
+
+    it('should return `false` if userInfo is not set in verify', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token))
+    })
+
+    it('should return `false` if userInfo is not a string in verify', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      assert.ok(!this.tokens.verify(this.secret, token, {}))
+    })
+
+    it('should reject undefined string userInfo (create)', function () {
+      assert.throws(function () {
+        this.tokens.create(this.secret)
+      }.bind(this), /argument userInfo.*required/)
+    })
+
+    it('should return `false` for tokens with no userInfo', function () {
+      var token = this.tokens.create(this.secret, 'foo')
+      token = token.substring(token.indexOf('-') + 1)
+      assert.ok(!this.tokens.verify(this.secret, token, 'foo'))
     })
   })
 })

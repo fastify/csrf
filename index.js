@@ -25,6 +25,7 @@ var crypto = require('crypto')
 var EQUAL_GLOBAL_REGEXP = /=/g
 var PLUS_GLOBAL_REGEXP = /\+/g
 var SLASH_GLOBAL_REGEXP = /\//g
+var MINUS_GLOBAL_REGEXP = /-/g
 
 /**
  * Module exports.
@@ -39,6 +40,8 @@ module.exports = Tokens
  * @param {object} [options]
  * @param {number} [options.saltLength=8] The string length of the salt
  * @param {number} [options.secretLength=18] The byte length of the secret key
+ * @param {number} [options.validity=0] The maximum milliseconds of validity of this token. 0 disables the check.
+ * @param {boolean} [options.userInfo=false] Require userInfo on create() and verify()
  * @public
  */
 
@@ -65,8 +68,26 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
+  var validity = opts.validity !== undefined
+    ? opts.validity
+    : 0
+
+  if (typeof validity !== 'number' || !isFinite(validity) || validity < 0) {
+    throw new TypeError('option validity must be finite number > 0')
+  }
+
+  var userInfo = opts.userInfo !== undefined
+    ? opts.userInfo
+    : false
+
+  if (typeof userInfo !== 'boolean') {
+    throw new TypeError('option userInfo must be a boolean')
+  }
+
   this.saltLength = saltLength
   this.secretLength = secretLength
+  this.validity = validity
+  this.userInfo = userInfo
 }
 
 /**
@@ -76,12 +97,19 @@ function Tokens (options) {
  * @public
  */
 
-Tokens.prototype.create = function create (secret) {
+Tokens.prototype.create = function create (secret, userInfo) {
   if (!secret || typeof secret !== 'string') {
     throw new TypeError('argument secret is required')
   }
+  var date = this.validity > 0 ? Date.now() : null
 
-  return this._tokenize(secret, rndm(this.saltLength))
+  if (this.userInfo) {
+    if (typeof userInfo !== 'string') {
+      throw new TypeError('argument userInfo is required to be a string')
+    }
+  }
+
+  return this._tokenize(secret, rndm(this.saltLength), date, userInfo)
 }
 
 /**
@@ -105,12 +133,26 @@ Tokens.prototype.secretSync = function secretSync () {
 }
 
 /**
- * Tokenize a secret and salt.
+ * Tokenize a secret, salt, date and userInfo.
  * @private
  */
 
-Tokens.prototype._tokenize = function tokenize (secret, salt) {
-  return salt + '-' + hash(salt + '-' + secret)
+Tokens.prototype._tokenize = function tokenize (secret, salt, date, userInfo) {
+  var toHash = ''
+
+  if (date !== null) {
+    toHash += date.toString(36) + '-'
+  }
+
+  if (typeof userInfo === 'string') {
+    // we hash the userInfo to ensure it's encoded properly and to have a fixed length
+    userInfo = hash(userInfo).replace(MINUS_GLOBAL_REGEXP, '_')
+    toHash += userInfo + '-'
+  }
+
+  toHash += salt
+
+  return toHash + '-' + hash(toHash + '-' + secret)
 }
 
 /**
@@ -118,10 +160,11 @@ Tokens.prototype._tokenize = function tokenize (secret, salt) {
  *
  * @param {string} secret
  * @param {string} token
+ * @param {string} userInfo
  * @public
  */
 
-Tokens.prototype.verify = function verify (secret, token) {
+Tokens.prototype.verify = function verify (secret, token, userInfo) {
   if (!secret || typeof secret !== 'string') {
     return false
   }
@@ -131,15 +174,50 @@ Tokens.prototype.verify = function verify (secret, token) {
   }
 
   var index = token.indexOf('-')
+  var toCompare = token
+  var date = null
+  var userInfo
 
   if (index === -1) {
     return false
   }
 
-  var salt = token.substr(0, index)
-  var expected = this._tokenize(secret, salt)
+  if (this.validity > 0) {
+    date = parseInt(token.substr(0, index), 36)
 
-  return compare(token, expected)
+    if (Date.now() - date > this.validity) {
+      return false
+    }
+
+    token = token.substr(index + 1)
+    index = token.indexOf('-')
+
+    if (index === -1) {
+      return false
+    }
+  }
+
+  if (this.userInfo) {
+    // validate the optional argument, it is required
+    // only if this.userInfo is true
+    if (!userInfo || typeof userInfo !== 'string') {
+      return false
+    }
+
+    // we skip the userInfo part, this will be
+    // verified with the hashing
+    token = token.substr(index + 1)
+    index = token.indexOf('-')
+
+    if (index === -1) {
+      return false
+    }
+  }
+
+  var salt = token.substr(0, index)
+  var expected = this._tokenize(secret, salt, date, userInfo)
+
+  return compare(toCompare, expected)
 }
 
 /**
