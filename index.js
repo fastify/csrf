@@ -198,7 +198,7 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   }
 
   if (this.userInfo) {
-    // validate the optiona argument, it is required
+    // validate the optional argument, it is required
     // only if this.userInfo is true
     if (!userInfo || typeof userInfo !== 'string') {
       return false
