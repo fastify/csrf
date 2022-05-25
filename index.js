@@ -2,6 +2,7 @@
  * csrf
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2015 Douglas Christopher Wilson
+ * Copyright(c) 2021-2022 Fastify Collaborators
  * MIT Licensed
  */
 
@@ -12,20 +13,20 @@
  * @private
  */
 
-var rndm = require('rndm')
-var uid = require('uid-safe')
-var compare = require('tsscmp')
-var crypto = require('crypto')
+const rndm = require('rndm')
+const uid = require('uid-safe')
+const compare = require('tsscmp')
+const crypto = require('crypto')
 
 /**
  * Module variables.
  * @private
  */
 
-var EQUAL_GLOBAL_REGEXP = /=/g
-var PLUS_GLOBAL_REGEXP = /\+/g
-var SLASH_GLOBAL_REGEXP = /\//g
-var MINUS_GLOBAL_REGEXP = /-/g
+const EQUAL_GLOBAL_REGEXP = /=/g
+const PLUS_GLOBAL_REGEXP = /\+/g
+const SLASH_GLOBAL_REGEXP = /\//g
+const MINUS_GLOBAL_REGEXP = /-/g
 
 /**
  * Module exports.
@@ -50,9 +51,9 @@ function Tokens (options) {
     return new Tokens(options)
   }
 
-  var opts = options || {}
+  const opts = options || {}
 
-  var saltLength = opts.saltLength !== undefined
+  const saltLength = opts.saltLength !== undefined
     ? opts.saltLength
     : 8
 
@@ -60,7 +61,7 @@ function Tokens (options) {
     throw new TypeError('option saltLength must be finite number > 1')
   }
 
-  var secretLength = opts.secretLength !== undefined
+  const secretLength = opts.secretLength !== undefined
     ? opts.secretLength
     : 18
 
@@ -68,7 +69,7 @@ function Tokens (options) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
-  var validity = opts.validity !== undefined
+  const validity = opts.validity !== undefined
     ? opts.validity
     : 0
 
@@ -76,7 +77,7 @@ function Tokens (options) {
     throw new TypeError('option validity must be finite number > 0')
   }
 
-  var userInfo = opts.userInfo !== undefined
+  const userInfo = opts.userInfo !== undefined
     ? opts.userInfo
     : false
 
@@ -101,7 +102,7 @@ Tokens.prototype.create = function create (secret, userInfo) {
   if (!secret || typeof secret !== 'string') {
     throw new TypeError('argument secret is required')
   }
-  var date = this.validity > 0 ? Date.now() : null
+  const date = this.validity > 0 ? Date.now() : null
 
   if (this.userInfo) {
     if (typeof userInfo !== 'string') {
@@ -138,7 +139,7 @@ Tokens.prototype.secretSync = function secretSync () {
  */
 
 Tokens.prototype._tokenize = function tokenize (secret, salt, date, userInfo) {
-  var toHash = ''
+  let toHash = ''
 
   if (date !== null) {
     toHash += date.toString(36) + '-'
@@ -173,10 +174,9 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
     return false
   }
 
-  var index = token.indexOf('-')
-  var toCompare = token
-  var date = null
-  var userInfo
+  let index = token.indexOf('-')
+  const toCompare = token
+  let date = null
 
   if (index === -1) {
     return false
@@ -214,8 +214,8 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
     }
   }
 
-  var salt = token.substr(0, index)
-  var expected = this._tokenize(secret, salt, date, userInfo)
+  const salt = token.substr(0, index)
+  const expected = this._tokenize(secret, salt, date, userInfo)
 
   return compare(toCompare, expected)
 }
