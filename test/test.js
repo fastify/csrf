@@ -1,8 +1,7 @@
-var assert = require('assert')
-var crypto = require('crypto')
+'use strict'
 
-var Promise = global.Promise || require('bluebird')
-var Tokens = require('..')
+const assert = require('assert')
+const Tokens = require('..')
 
 // Add Promise to mocha's global list
 // eslint-disable-next-line no-self-assign
@@ -101,47 +100,26 @@ describe('Tokens', function () {
     })
 
     it('should create a token', function () {
-      var token = this.tokens.create(this.secret)
+      const token = this.tokens.create(this.secret)
       assert.ok(typeof token === 'string')
     })
 
     it('should always be the same length', function () {
-      var token = this.tokens.create(this.secret)
+      const token = this.tokens.create(this.secret)
       assert.ok(token.length > 0)
 
-      for (var i = 0; i < 1000; i++) {
+      for (let i = 0; i < 1000; i++) {
         assert.strictEqual(this.tokens.create(this.secret).length, token.length)
       }
     })
 
     it('should not contain /, +, or =', function () {
-      for (var i = 0; i < 1000; i++) {
-        var token = this.tokens.create(this.secret)
+      for (let i = 0; i < 1000; i++) {
+        const token = this.tokens.create(this.secret)
         assert(!~token.indexOf('/'))
         assert(!~token.indexOf('+'))
         assert(!~token.indexOf('='))
       }
-    })
-
-    describe('when crypto.DEFAULT_ENCODING altered', function () {
-      before(function () {
-        // eslint-disable-next-line node/no-deprecated-api
-        this.defaultEncoding = crypto.DEFAULT_ENCODING
-
-        // eslint-disable-next-line node/no-deprecated-api
-        crypto.DEFAULT_ENCODING = 'hex'
-      })
-
-      after(function () {
-        // eslint-disable-next-line node/no-deprecated-api
-        crypto.DEFAULT_ENCODING = this.defaultEncoding
-      })
-
-      it('should create a token', function () {
-        var token = this.tokens.create(this.secret)
-        assert.ok(typeof token === 'string')
-        assert.ok(token.length > 0)
-      })
     })
   })
 
@@ -217,7 +195,7 @@ describe('Tokens', function () {
     })
 
     it('should create a secret', function () {
-      var secret = this.tokens.secretSync()
+      const secret = this.tokens.secretSync()
       assert.ok(typeof secret === 'string')
       assert.ok(secret.length > 0)
     })
@@ -230,12 +208,12 @@ describe('Tokens', function () {
     })
 
     it('should return `true` with valid tokens', function () {
-      var token = this.tokens.create(this.secret)
+      const token = this.tokens.create(this.secret)
       assert.ok(this.tokens.verify(this.secret, token))
     })
 
     it('should return `false` with invalid tokens', function () {
-      var token = this.tokens.create(this.secret)
+      const token = this.tokens.create(this.secret)
       assert.ok(!this.tokens.verify(this.tokens.secretSync(), token))
       assert.ok(!this.tokens.verify('asdfasdfasdf', token))
     })
@@ -261,32 +239,32 @@ describe('Tokens', function () {
     })
 
     it('should return `true` with valid tokens', function () {
-      var token = this.tokens.create(this.secret)
+      const token = this.tokens.create(this.secret)
       assert.ok(this.tokens.verify(this.secret, token))
     })
 
     it('should return `false` if current time is outside the validity interval', function () {
-      var token = this.tokens.create(this.secret)
-      var now = Date.now()
-      var fn = Date.now
+      const token = this.tokens.create(this.secret)
+      const now = Date.now()
+      const fn = Date.now
       Date.now = function () { return now + 1 + 60 * 60 }
-      var valid = this.tokens.verify(this.secret, token)
+      const valid = this.tokens.verify(this.secret, token)
       Date.now = fn
       assert.ok(!valid)
     })
 
     it('should return `true` if current time is at the max of the validity interval', function () {
-      var token = this.tokens.create(this.secret)
-      var now = Date.now()
-      var fn = Date.now
+      const token = this.tokens.create(this.secret)
+      const now = Date.now()
+      const fn = Date.now
       Date.now = function () { return now + 60 * 60 }
-      var valid = this.tokens.verify(this.secret, token)
+      const valid = this.tokens.verify(this.secret, token)
       Date.now = fn
       assert.ok(valid)
     })
 
     it('should return `false` for tokens with no date', function () {
-      var token = this.tokens.create(this.secret)
+      let token = this.tokens.create(this.secret)
       token = token.substring(token.indexOf('-') + 1)
       assert.ok(!this.tokens.verify(this.secret, token))
     })
@@ -301,22 +279,22 @@ describe('Tokens', function () {
     })
 
     it('should return `true` with valid tokens', function () {
-      var token = this.tokens.create(this.secret, 'foobar')
+      const token = this.tokens.create(this.secret, 'foobar')
       assert.ok(this.tokens.verify(this.secret, token, 'foobar'))
     })
 
     it('should return `false` if userInfo does not match', function () {
-      var token = this.tokens.create(this.secret, 'foo')
+      const token = this.tokens.create(this.secret, 'foo')
       assert.ok(!this.tokens.verify(this.secret, token, 'foobar'))
     })
 
     it('should return `false` if userInfo is not set in verify', function () {
-      var token = this.tokens.create(this.secret, 'foo')
+      const token = this.tokens.create(this.secret, 'foo')
       assert.ok(!this.tokens.verify(this.secret, token))
     })
 
     it('should return `false` if userInfo is not a string in verify', function () {
-      var token = this.tokens.create(this.secret, 'foo')
+      const token = this.tokens.create(this.secret, 'foo')
       assert.ok(!this.tokens.verify(this.secret, token, {}))
     })
 
@@ -327,7 +305,7 @@ describe('Tokens', function () {
     })
 
     it('should return `false` for tokens with no userInfo', function () {
-      var token = this.tokens.create(this.secret, 'foo')
+      let token = this.tokens.create(this.secret, 'foo')
       token = token.substring(token.indexOf('-') + 1)
       assert.ok(!this.tokens.verify(this.secret, token, 'foo'))
     })

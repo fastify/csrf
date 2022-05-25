@@ -1,2 +1,4 @@
 root: true
-extends: standard
+extends:
+  - standard
+  - plugin:markdown/recommended

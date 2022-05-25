@@ -32,7 +32,7 @@ information for TypeScript projects.
 <!-- eslint-disable no-unused-vars -->
 
 ```js
-var Tokens = require('@fastify/csrf')
+const Tokens = require('@fastify/csrf')
 ```
 
 ### new Tokens([options])
@@ -75,8 +75,8 @@ expect the user's browser to provide back.
 <!-- eslint-disable no-undef, no-unused-vars -->
 
 ```js
-var secret = tokens.secretSync()
-var token = tokens.create(secret)
+const secret = tokens.secretSync()
+const token = tokens.create(secret)
 ```
 
 The `userInfo` parameter can be used to protect against cookie tossing
@@ -124,7 +124,7 @@ A synchronous version of `tokens.secret(callback)`. Please see
 <!-- eslint-disable no-undef, no-unused-vars -->
 
 ```js
-var secret = tokens.secretSync()
+const secret = tokens.secretSync()
 ```
 
 #### tokens.verify(secret, token[, userInfo])
