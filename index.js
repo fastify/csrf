@@ -71,6 +71,8 @@ function Tokens (options) {
  * Create a new CSRF token.
  *
  * @param {string} secret The secret for the token.
+ * @param {?string} userInfo The userInfo for the token.
+ * @returns {string}
  * @public
  */
 
@@ -93,23 +95,21 @@ Tokens.prototype.create = function create (secret, userInfo) {
  * Create a new secret key.
  *
  * @param {function} [callback]
+ * @returns {string}
  * @public
  */
 
 Tokens.prototype.secret = Buffer.isEncoding('base64url')
   ? function secret (callback) {
-    // validate callback is a function, if provided
     if (callback !== undefined && typeof callback !== 'function') {
       throw new TypeError('argument callback must be a function')
     }
 
-    // require the callback without promises
     if (!callback && !global.Promise) {
       throw new TypeError('argument callback is required')
     }
 
     if (callback) {
-      // classic callback style
       crypto.randomBytes(this.secretLength, (err, buf) => {
         err
           ? callback(err)
@@ -127,18 +127,15 @@ Tokens.prototype.secret = Buffer.isEncoding('base64url')
     })
   }
   : function secret (callback) {
-    // validate callback is a function, if provided
     if (callback !== undefined && typeof callback !== 'function') {
       throw new TypeError('argument callback must be a function')
     }
 
-    // require the callback without promises
     if (!callback && !global.Promise) {
       throw new TypeError('argument callback is required')
     }
 
     if (callback) {
-      // classic callback style
       return crypto.randomBytes(this.secretLength, function (err, buf) {
         err
           ? callback(err)
@@ -165,6 +162,7 @@ Tokens.prototype.secret = Buffer.isEncoding('base64url')
 
 /**
  * Create a new secret key synchronously.
+ * @returns {string}
  * @public
  */
 
@@ -183,11 +181,12 @@ Tokens.prototype.secretSync = Buffer.isEncoding('base64url')
 
 /**
  * Tokenize a secret, salt, date and userInfo.
+ * @returns {string}
  * @private
  */
 
 Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
-  ? function tokenize (secret, salt, date, userInfo) {
+  ? function _tokenize (secret, salt, date, userInfo) {
     let toHash = ''
 
     if (date !== null) {
@@ -195,7 +194,6 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      // we hash the userInfo to ensure it's encoded properly and to have a fixed length
       userInfo = crypto
         .createHash('sha1')
         .update(userInfo)
@@ -211,7 +209,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
       .update(toHash + '-' + secret, 'ascii')
       .digest('base64url')
   }
-  : function tokenize (secret, salt, date, userInfo) {
+  : function _tokenize (secret, salt, date, userInfo) {
     let toHash = ''
 
     if (date !== null) {
@@ -219,7 +217,6 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      // we hash the userInfo to ensure it's encoded properly and to have a fixed length
       userInfo = crypto
         .createHash('sha1')
         .update(userInfo)
@@ -243,9 +240,10 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
 /**
  * Verify if a given token is valid for a given secret.
  *
- * @param {string} secret
- * @param {string} token
- * @param {string} userInfo
+ * @param {string} secret The secret for the token.
+ * @param {string} token The token itself.s
+ * @param {?string} userInfo The userInfo for the token.
+ * @returns {string}
  * @public
  */
 
@@ -286,8 +284,7 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   }
 
   if (this.userInfo) {
-    // we skip the userInfo part, this will be
-    // verified with the hashing
+    // we skip the userInfo part, this will be verified with the hashing
     token = token.slice(index + 1)
     index = token.indexOf('-')
 
@@ -299,9 +296,9 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   const salt = token.slice(0, index)
   const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo))
 
-  // to avoid the exposure if the provided value has the right length, we call
-  // timingSafeEqual with the actual value. The length check itself is timing
-  // safe
+  // to avoid the exposure if the provided value has the correct length, we call
+  // timingSafeEqual with the actual value. The additional length check itself is timing
+  // timing safe.
   return crypto.timingSafeEqual(
     actual.length === expected.length
       ? expected
