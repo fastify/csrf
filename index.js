@@ -297,7 +297,7 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo))
 
   // to avoid the exposure if the provided value has the correct length, we call
-  // timingSafeEqual with the actual value. The additional length check itself is timing
+  // timingSafeEqual with the actual value. The additional length check itself is
   // timing safe.
   return crypto.timingSafeEqual(
     actual.length === expected.length
