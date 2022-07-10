@@ -258,6 +258,12 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
     return false
   }
 
+  // validate the optional argument, it is required
+  // only if this.userInfo is true
+  if (this.userInfo && (!userInfo || typeof userInfo !== 'string')) {
+    return false
+  }
+
   let index = token.indexOf('-')
   if (index === -1) {
     return false
@@ -282,12 +288,6 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   }
 
   if (this.userInfo) {
-    // validate the optional argument, it is required
-    // only if this.userInfo is true
-    if (!userInfo || typeof userInfo !== 'string') {
-      return false
-    }
-
     // we skip the userInfo part, this will be
     // verified with the hashing
     token = token.slice(index + 1)
