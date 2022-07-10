@@ -224,7 +224,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
         .createHash('sha1')
         .update(userInfo)
         .digest('base64')
-        .replace(MINUS_SLASH_GLOBAL_REGEXP, '_')
+        .replace(PLUS_SLASH_GLOBAL_REGEXP, '_')
         .replace(EQUAL_GLOBAL_REGEXP, '')
       toHash += userInfo + '-'
     }
@@ -316,7 +316,7 @@ const EQUAL_GLOBAL_REGEXP = /=/g
 const PLUS_GLOBAL_REGEXP = /\+/g
 const SLASH_GLOBAL_REGEXP = /\//g
 const MINUS_GLOBAL_REGEXP = /-/g
-const MINUS_SLASH_GLOBAL_REGEXP = /[-/]/g
+const PLUS_SLASH_GLOBAL_REGEXP = /[+/]/g
 
 function saltGenerator (saltLength) {
   const fnBody = []
