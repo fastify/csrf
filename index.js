@@ -1,7 +1,7 @@
 'use strict'
 
 /*!
- * csrf
+ * @fastify/csrf
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2015 Douglas Christopher Wilson
  * Copyright(c) 2021-2022 Fastify Collaborators
