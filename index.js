@@ -194,12 +194,11 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      userInfo = crypto
+      toHash += crypto
         .createHash('sha1')
         .update(userInfo)
         .digest('base64url')
-        .replace(MINUS_GLOBAL_REGEXP, '_')
-      toHash += userInfo + '-'
+        .replace(MINUS_GLOBAL_REGEXP, '_') + '-'
     }
 
     toHash += salt
@@ -217,13 +216,12 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      userInfo = crypto
+      toHash += crypto
         .createHash('sha1')
         .update(userInfo)
         .digest('base64')
         .replace(PLUS_SLASH_GLOBAL_REGEXP, '_')
-        .replace(EQUAL_GLOBAL_REGEXP, '')
-      toHash += userInfo + '-'
+        .replace(EQUAL_GLOBAL_REGEXP, '') + '-'
     }
 
     toHash += salt
@@ -260,40 +258,42 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
     return false
   }
 
-  let index = token.indexOf('-')
-  if (index === -1) {
+  let curIdx = 0
+  let nextIdx = token.indexOf('-')
+  if (nextIdx === -1) {
     return false
   }
 
-  const actual = Buffer.from(token)
   let date = null
 
   if (this.validity > 0) {
-    date = parseInt(token.slice(0, index), 36)
+    date = parseInt(token.slice(curIdx, nextIdx), 36)
 
     if (Date.now() - date > this.validity) {
       return false
     }
 
-    token = token.slice(index + 1)
-    index = token.indexOf('-')
+    curIdx = nextIdx + 1
+    nextIdx = token.indexOf('-', curIdx)
 
-    if (index === -1) {
+    if (nextIdx === -1) {
       return false
     }
   }
 
   if (this.userInfo) {
     // we skip the userInfo part, this will be verified with the hashing
-    token = token.slice(index + 1)
-    index = token.indexOf('-')
+    curIdx = nextIdx + 1
+    nextIdx = token.indexOf('-', curIdx)
 
-    if (index === -1) {
+    if (nextIdx === -1) {
       return false
     }
   }
 
-  const salt = token.slice(0, index)
+  const salt = token.slice(curIdx, nextIdx)
+
+  const actual = Buffer.from(token)
   const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo))
 
   // to avoid the exposure if the provided value has the correct length, we call
