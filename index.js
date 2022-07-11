@@ -1,39 +1,14 @@
+'use strict'
+
 /*!
- * csrf
+ * @fastify/csrf
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2015 Douglas Christopher Wilson
  * Copyright(c) 2021-2022 Fastify Collaborators
  * MIT Licensed
  */
 
-'use strict'
-
-/**
- * Module dependencies.
- * @private
- */
-
-const rndm = require('rndm')
-const uid = require('uid-safe')
-const compare = require('tsscmp')
 const crypto = require('crypto')
-
-/**
- * Module variables.
- * @private
- */
-
-const EQUAL_GLOBAL_REGEXP = /=/g
-const PLUS_GLOBAL_REGEXP = /\+/g
-const SLASH_GLOBAL_REGEXP = /\//g
-const MINUS_GLOBAL_REGEXP = /-/g
-
-/**
- * Module exports.
- * @public
- */
-
-module.exports = Tokens
 
 /**
  * Token generation/verification class.
@@ -86,6 +61,7 @@ function Tokens (options) {
   }
 
   this.saltLength = saltLength
+  this.saltGenerator = saltGenerator(saltLength)
   this.secretLength = secretLength
   this.validity = validity
   this.userInfo = userInfo
@@ -95,6 +71,8 @@ function Tokens (options) {
  * Create a new CSRF token.
  *
  * @param {string} secret The secret for the token.
+ * @param {?string} userInfo The userInfo for the token.
+ * @returns {string}
  * @public
  */
 
@@ -110,58 +88,160 @@ Tokens.prototype.create = function create (secret, userInfo) {
     }
   }
 
-  return this._tokenize(secret, rndm(this.saltLength), date, userInfo)
+  return this._tokenize(secret, this.saltGenerator(), date, userInfo)
 }
 
 /**
  * Create a new secret key.
  *
  * @param {function} [callback]
+ * @returns {string}
  * @public
  */
 
-Tokens.prototype.secret = function secret (callback) {
-  return uid(this.secretLength, callback)
-}
+Tokens.prototype.secret = Buffer.isEncoding('base64url')
+  ? function secret (callback) {
+    if (callback !== undefined && typeof callback !== 'function') {
+      throw new TypeError('argument callback must be a function')
+    }
+
+    if (!callback && !global.Promise) {
+      throw new TypeError('argument callback is required')
+    }
+
+    if (callback) {
+      crypto.randomBytes(this.secretLength, (err, buf) => {
+        err
+          ? callback(err)
+          : callback(null, buf.toString('base64url'))
+      })
+      return
+    }
+
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(this.secretLength, (err, buf) => {
+        err
+          ? reject(err)
+          : resolve(buf.toString('base64url'))
+      })
+    })
+  }
+  : function secret (callback) {
+    if (callback !== undefined && typeof callback !== 'function') {
+      throw new TypeError('argument callback must be a function')
+    }
+
+    if (!callback && !global.Promise) {
+      throw new TypeError('argument callback is required')
+    }
+
+    if (callback) {
+      return crypto.randomBytes(this.secretLength, function (err, buf) {
+        err
+          ? callback(err)
+          : callback(null, buf
+            .toString('base64')
+            .replace(PLUS_GLOBAL_REGEXP, '-')
+            .replace(SLASH_GLOBAL_REGEXP, '_')
+            .replace(EQUAL_GLOBAL_REGEXP, ''))
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(this.secretLength, (err, buf) => {
+        err
+          ? reject(err)
+          : resolve(buf
+            .toString('base64')
+            .replace(PLUS_GLOBAL_REGEXP, '-')
+            .replace(SLASH_GLOBAL_REGEXP, '_')
+            .replace(EQUAL_GLOBAL_REGEXP, ''))
+      })
+    })
+  }
 
 /**
  * Create a new secret key synchronously.
+ * @returns {string}
  * @public
  */
 
-Tokens.prototype.secretSync = function secretSync () {
-  return uid.sync(this.secretLength)
-}
+Tokens.prototype.secretSync = Buffer.isEncoding('base64url')
+  ? function secretSync () {
+    return crypto.randomBytes(this.secretLength)
+      .toString('base64url')
+  }
+  : function secretSync () {
+    return crypto.randomBytes(this.secretLength)
+      .toString('base64')
+      .replace(PLUS_GLOBAL_REGEXP, '-')
+      .replace(SLASH_GLOBAL_REGEXP, '_')
+      .replace(EQUAL_GLOBAL_REGEXP, '')
+  }
 
 /**
  * Tokenize a secret, salt, date and userInfo.
+ * @returns {string}
  * @private
  */
 
-Tokens.prototype._tokenize = function tokenize (secret, salt, date, userInfo) {
-  let toHash = ''
+Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
+  ? function _tokenize (secret, salt, date, userInfo) {
+    let toHash = ''
 
-  if (date !== null) {
-    toHash += date.toString(36) + '-'
+    if (date !== null) {
+      toHash += date.toString(36) + '-'
+    }
+
+    if (typeof userInfo === 'string') {
+      toHash += crypto
+        .createHash('sha1')
+        .update(userInfo)
+        .digest('base64url')
+        .replace(MINUS_GLOBAL_REGEXP, '_') + '-'
+    }
+
+    toHash += salt
+
+    return toHash + '-' + crypto
+      .createHash('sha1')
+      .update(toHash + '-' + secret, 'ascii')
+      .digest('base64url')
   }
+  : function _tokenize (secret, salt, date, userInfo) {
+    let toHash = ''
 
-  if (typeof userInfo === 'string') {
-    // we hash the userInfo to ensure it's encoded properly and to have a fixed length
-    userInfo = hash(userInfo).replace(MINUS_GLOBAL_REGEXP, '_')
-    toHash += userInfo + '-'
+    if (date !== null) {
+      toHash += date.toString(36) + '-'
+    }
+
+    if (typeof userInfo === 'string') {
+      toHash += crypto
+        .createHash('sha1')
+        .update(userInfo)
+        .digest('base64')
+        .replace(PLUS_SLASH_GLOBAL_REGEXP, '_')
+        .replace(EQUAL_GLOBAL_REGEXP, '') + '-'
+    }
+
+    toHash += salt
+
+    return toHash + '-' + crypto
+      .createHash('sha1')
+      .update(toHash + '-' + secret, 'ascii')
+      .digest('base64')
+      .replace(PLUS_GLOBAL_REGEXP, '-')
+      .replace(SLASH_GLOBAL_REGEXP, '_')
+      .replace(EQUAL_GLOBAL_REGEXP, '')
   }
-
-  toHash += salt
-
-  return toHash + '-' + hash(toHash + '-' + secret)
-}
 
 /**
  * Verify if a given token is valid for a given secret.
  *
- * @param {string} secret
- * @param {string} token
- * @param {string} userInfo
+ * @param {string} secret The secret for the token.
+ * @param {string} token The token itself.s
+ * @param {?string} userInfo The userInfo for the token.
+ * @returns {string}
  * @public
  */
 
@@ -174,64 +254,77 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
     return false
   }
 
-  let index = token.indexOf('-')
-  const toCompare = token
-  let date = null
-
-  if (index === -1) {
+  if (this.userInfo && (!userInfo || typeof userInfo !== 'string')) {
     return false
   }
 
+  let curIdx = 0
+  let nextIdx = token.indexOf('-')
+  if (nextIdx === -1) {
+    return false
+  }
+
+  let date = null
+
   if (this.validity > 0) {
-    date = parseInt(token.substr(0, index), 36)
+    date = parseInt(token.slice(curIdx, nextIdx), 36)
 
     if (Date.now() - date > this.validity) {
       return false
     }
 
-    token = token.substr(index + 1)
-    index = token.indexOf('-')
+    curIdx = nextIdx + 1
+    nextIdx = token.indexOf('-', curIdx)
 
-    if (index === -1) {
+    if (nextIdx === -1) {
       return false
     }
   }
 
   if (this.userInfo) {
-    // validate the optional argument, it is required
-    // only if this.userInfo is true
-    if (!userInfo || typeof userInfo !== 'string') {
-      return false
-    }
+    // we skip the userInfo part, this will be verified with the hashing
+    curIdx = nextIdx + 1
+    nextIdx = token.indexOf('-', curIdx)
 
-    // we skip the userInfo part, this will be
-    // verified with the hashing
-    token = token.substr(index + 1)
-    index = token.indexOf('-')
-
-    if (index === -1) {
+    if (nextIdx === -1) {
       return false
     }
   }
 
-  const salt = token.substr(0, index)
-  const expected = this._tokenize(secret, salt, date, userInfo)
+  const salt = token.slice(curIdx, nextIdx)
 
-  return compare(toCompare, expected)
+  const actual = Buffer.from(token)
+  const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo))
+
+  // to avoid the exposure if the provided value has the correct length, we call
+  // timingSafeEqual with the actual value. The additional length check itself is
+  // timing safe.
+  return crypto.timingSafeEqual(
+    actual.length === expected.length
+      ? expected
+      : actual,
+    actual
+  ) && actual.length === expected.length
 }
 
-/**
- * Hash a string with SHA1, returning url-safe base64
- * @param {string} str
- * @private
- */
+const EQUAL_GLOBAL_REGEXP = /=/g
+const PLUS_GLOBAL_REGEXP = /\+/g
+const SLASH_GLOBAL_REGEXP = /\//g
+const MINUS_GLOBAL_REGEXP = /-/g
+const PLUS_SLASH_GLOBAL_REGEXP = /[+/]/g
 
-function hash (str) {
-  return crypto
-    .createHash('sha1')
-    .update(str, 'ascii')
-    .digest('base64')
-    .replace(PLUS_GLOBAL_REGEXP, '-')
-    .replace(SLASH_GLOBAL_REGEXP, '_')
-    .replace(EQUAL_GLOBAL_REGEXP, '')
+function saltGenerator (saltLength) {
+  const fnBody = []
+
+  fnBody.push('const base62 = \'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\'.split(\'\');')
+  fnBody.push('return function () {')
+  const salt = []
+  for (let i = 0; i < saltLength; ++i) salt.push('base62[(62 * Math.random()) | 0]')
+  fnBody.push('return ' + salt.join('+'))
+  fnBody.push('}')
+  return new Function(fnBody.join(''))() // eslint-disable-line no-new-func
 }
+
+module.exports = Tokens
+module.exports.default = Tokens
+module.exports.Tokens = Tokens

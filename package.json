@@ -16,11 +16,6 @@
     "url": "https://github.com/fastify/csrf/issues"
   },
   "homepage": "https://github.com/fastify/csrf#readme",
-  "dependencies": {
-    "rndm": "^1.2.0",
-    "tsscmp": "^1.0.6",
-    "uid-safe": "^2.1.5"
-  },
   "devDependencies": {
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
@@ -31,21 +26,24 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "mocha": "^10.0.0",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "tsd": "^0.22.0"
   },
+  "types": "types/index.d.ts",
   "files": [
     "LICENSE",
-    "HISTORY.md",
     "README.md",
-    "index.d.ts",
+    "types/index.d.ts",
     "index.js"
   ],
   "scripts": {
     "bench": "node benchmark/index.js",
     "lint": "eslint --plugin markdown --ext js,md .",
-    "test": "mocha --trace-deprecation --reporter spec --bail --check-leaks test/",
-    "test-ci": "nyc --reporter=text npm test",
-    "test-cov": "nyc --reporter=html --reporter=text npm test"
+    "test": "npm run test:unit && npm run test:types",
+    "test:unit": "mocha --trace-deprecation --reporter spec --bail --check-leaks test/",
+    "test-ci": "nyc --reporter=text npm run test:unit",
+    "test-cov": "nyc --reporter=html --reporter=text npm test:unit",
+    "test:types": "tsd"
   },
   "keywords": [
     "csrf",
