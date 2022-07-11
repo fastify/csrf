@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -8,34 +7,34 @@ const benchmarks = require('beautify-benchmark')
 const Tokens = require('..')
 
 /**
- * Globals for benchmark.js
- */
+* Globals for benchmark.js
+*/
 
-global.tokens = new Tokens()
+const tokens = new Tokens()
 
 const suite = new benchmark.Suite()
 
-suite.add({
-  name: 'secretSync',
-  minSamples: 100,
-  fn: 'var secret = tokens.secretSync()'
+suite.add('secretSync', function () {
+  tokens.secretSync()
+}, {
+  minSamples: 100
 })
 
-suite.add({
-  name: 'secret - callback',
+suite.add('secret - callback', function (deferred) {
+  tokens.secret(function () { deferred.resolve() })
+}, {
   minSamples: 100,
   defer: true,
-  fn: 'tokens.secret(function (err, secret) { deferred.resolve() })'
+  delay: 0
 })
 
-if (global.Promise) {
-  suite.add({
-    name: 'secret - promise',
-    minSamples: 100,
-    defer: true,
-    fn: 'tokens.secret().then(function (secret) { deferred.resolve() })'
-  })
-}
+suite.add('secret - promise', function (deferred) {
+  tokens.secret().then(function (secret) { deferred.resolve() })
+}, {
+  minSamples: 100,
+  defer: true,
+  delay: 0
+})
 
 suite.on('start', function onCycle (event) {
   process.stdout.write('  secret\n\n')

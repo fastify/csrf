@@ -63,6 +63,7 @@ function Tokens (options) {
   this.saltLength = saltLength
   this.saltGenerator = saltGenerator(saltLength)
   this.secretLength = secretLength
+  this.secretGenerator = secretGenerator(secretLength)
   this.validity = validity
   this.userInfo = userInfo
 }
@@ -99,66 +100,22 @@ Tokens.prototype.create = function create (secret, userInfo) {
  * @public
  */
 
-Tokens.prototype.secret = Buffer.isEncoding('base64url')
-  ? function secret (callback) {
-    if (callback !== undefined && typeof callback !== 'function') {
-      throw new TypeError('argument callback must be a function')
-    }
-
-    if (!callback && !global.Promise) {
-      throw new TypeError('argument callback is required')
-    }
-
-    if (callback) {
-      crypto.randomBytes(this.secretLength, (err, buf) => {
-        err
-          ? callback(err)
-          : callback(null, buf.toString('base64url'))
-      })
-      return
-    }
-
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(this.secretLength, (err, buf) => {
-        err
-          ? reject(err)
-          : resolve(buf.toString('base64url'))
-      })
-    })
+Tokens.prototype.secret = function secret (callback) {
+  if (callback !== undefined && typeof callback !== 'function') {
+    throw new TypeError('argument callback must be a function')
   }
-  : function secret (callback) {
-    if (callback !== undefined && typeof callback !== 'function') {
-      throw new TypeError('argument callback must be a function')
-    }
 
-    if (!callback && !global.Promise) {
-      throw new TypeError('argument callback is required')
-    }
-
-    if (callback) {
-      return crypto.randomBytes(this.secretLength, function (err, buf) {
-        err
-          ? callback(err)
-          : callback(null, buf
-            .toString('base64')
-            .replace(PLUS_GLOBAL_REGEXP, '-')
-            .replace(SLASH_GLOBAL_REGEXP, '_')
-            .replace(EQUAL_GLOBAL_REGEXP, ''))
-      })
-    }
-
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(this.secretLength, (err, buf) => {
-        err
-          ? reject(err)
-          : resolve(buf
-            .toString('base64')
-            .replace(PLUS_GLOBAL_REGEXP, '-')
-            .replace(SLASH_GLOBAL_REGEXP, '_')
-            .replace(EQUAL_GLOBAL_REGEXP, ''))
-      })
-    })
+  if (!callback && !global.Promise) {
+    throw new TypeError('argument callback is required')
   }
+
+  if (callback) {
+    callback(null, this.secretGenerator())
+    return
+  }
+
+  return Promise.resolve(this.secretGenerator())
+}
 
 /**
  * Create a new secret key synchronously.
@@ -166,18 +123,9 @@ Tokens.prototype.secret = Buffer.isEncoding('base64url')
  * @public
  */
 
-Tokens.prototype.secretSync = Buffer.isEncoding('base64url')
-  ? function secretSync () {
-    return crypto.randomBytes(this.secretLength)
-      .toString('base64url')
-  }
-  : function secretSync () {
-    return crypto.randomBytes(this.secretLength)
-      .toString('base64')
-      .replace(PLUS_GLOBAL_REGEXP, '-')
-      .replace(SLASH_GLOBAL_REGEXP, '_')
-      .replace(EQUAL_GLOBAL_REGEXP, '')
-  }
+Tokens.prototype.secretSync = function secretSync () {
+  return this.secretGenerator()
+}
 
 /**
  * Tokenize a secret, salt, date and userInfo.
@@ -312,6 +260,19 @@ const PLUS_GLOBAL_REGEXP = /\+/g
 const SLASH_GLOBAL_REGEXP = /\//g
 const MINUS_GLOBAL_REGEXP = /-/g
 const PLUS_SLASH_GLOBAL_REGEXP = /[+/]/g
+
+function secretGenerator (secretLength) {
+  const fnBody = []
+
+  fnBody.push('const randomInt = crypto.randomInt;')
+  fnBody.push('const base64url = \'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_\'.split(\'\');')
+  fnBody.push('return function () {')
+  const secret = []
+  for (let i = 0; i < ((secretLength * 1.5) | 0); ++i) secret.push('base64url[randomInt(0, 64)]')
+  fnBody.push('return ' + secret.join('+'))
+  fnBody.push('}')
+  return new Function('crypto', fnBody.join(''))(crypto) // eslint-disable-line no-new-func
+}
 
 function saltGenerator (saltLength) {
   const fnBody = []
