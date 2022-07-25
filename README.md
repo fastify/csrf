@@ -18,7 +18,7 @@ This module is a fork of https://github.com/pillarjs/csrf at f0d66c91ea4be6d30a0
 ### Install
 
 ```sh
-$ npm install @fastify/csrf
+$ npm i @fastify/csrf
 ```
 
 ### TypeScript
