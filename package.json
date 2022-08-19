@@ -41,7 +41,7 @@
     "test": "npm run test:unit && npm run test:types",
     "test:unit": "tap",
     "test-ci": "nyc --reporter=text npm run test:unit",
-    "test-cov": "nyc --reporter=html --reporter=text npm test:unit",
+    "test:coverage": "tap --coverage-report=html",
     "test:types": "tsd"
   },
   "keywords": [

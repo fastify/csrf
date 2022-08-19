@@ -15,29 +15,31 @@ test('.create() and verify() with validity: should return `true` with valid toke
 test('.create() and verify() with validity: should return `false` if current time is outside the validity interval', t => {
   t.plan(1)
 
-  const secret = new Tokens().secretSync()
-  const token = new Tokens({ validity: 3600 }).create(secret)
-
   const fn = Date.now
   const now = Date.now()
   t.teardown(() => { Date.now = fn })
-  Date.now = function () { return now + 3601 }
 
+  const secret = new Tokens().secretSync()
+  Date.now = function () { return now }
+  const token = new Tokens({ validity: 3600 }).create(secret)
+
+  Date.now = function () { return now + 3601 }
   t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
 })
 
 test('.create() and verify() with validity: should return `true` if current time is at the max of the validity interval', t => {
   t.plan(1)
 
-  const secret = new Tokens().secretSync()
-  const token = new Tokens({ validity: 3600 }).create(secret)
-
   const fn = Date.now
   const now = Date.now()
   t.teardown(() => { Date.now = fn })
-  Date.now = function () { return now + 3600 }
 
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), true)
+  Date.now = function () { return now }
+  const secret = new Tokens().secretSync()
+  Date.now = function () { return now + 3600 }
+  const token = new Tokens({ validity: 3600 }).create(secret)
+
+  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), true, { secret, token, now })
 })
 
 test('.create() and verify() with validity: should return `false` for tokens with no date', t => {
