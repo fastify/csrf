@@ -52,3 +52,8 @@ test('Tokens.constructor: instantiating Tokens with a non-boolean for userInfo s
   t.plan(1)
   t.throws(() => new Tokens({ userInfo: 'bogus' }), new TypeError('option userInfo must be a boolean'))
 })
+
+test('Tokens.constructor: instantiating Tokens without new creates still the Tokens-Instance', t => {
+  t.plan(1)
+  t.ok(Tokens() instanceof Tokens, true)
+})
