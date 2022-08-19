@@ -19,3 +19,13 @@ test('Tokens.secretSync: should create a secret', t => {
   t.type(secret, 'string')
   t.equal(secret.length, 24)
 })
+
+test('Tokens.secretSync: should not contain /, +, or = when using base64', t => {
+  t.plan(3000)
+
+  for (let i = 0; i < 1000; i++) {
+    t.not(new Tokens().secretSync().includes('/'))
+    t.not(new Tokens().secretSync().includes('+'))
+    t.not(new Tokens().secretSync().includes('='))
+  }
+})

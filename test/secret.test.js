@@ -31,19 +31,43 @@ test('Tokens.secret: with global Promise', t => {
 test('Tokens.secret: without global Promise', t => {
   t.plan(1)
 
+  const promise = Promise
   global.Promise = undefined
+  t.teardown(() => { global.Promise = promise })
 
   t.throws(() => new Tokens().secret(), new TypeError('argument callback is required'))
-
-  global.Promise = Promise
 })
 
 test('Tokens.secret: without global Promise should reject bad callback', t => {
   t.plan(1)
 
+  const promise = Promise
   global.Promise = undefined
-
+  t.teardown(() => { global.Promise = promise })
   t.throws(() => new Tokens().secret(42), new TypeError('argument callback must be a function'))
+})
 
-  global.Promise = Promise
+test('Tokens.secret: should not contain /, +, or =, Promise', t => {
+  t.plan(3000)
+
+  for (let i = 0; i < 1000; i++) {
+    new Tokens().secret().then(function (secret) {
+      t.not(secret.includes('/'))
+      t.not(secret.includes('+'))
+      t.not(secret.includes('='))
+    })
+  }
+})
+
+test('Tokens.secret: should not contain /, +, or =, callback', t => {
+  t.plan(4000)
+
+  for (let i = 0; i < 1000; i++) {
+    new Tokens().secret(function (err, secret) {
+      t.error(err)
+      t.not(secret.includes('/'))
+      t.not(secret.includes('+'))
+      t.not(secret.includes('='))
+    })
+  }
 })

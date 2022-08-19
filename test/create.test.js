@@ -44,23 +44,20 @@ test('Tokens.create: should always be the same length', t => {
 test('Tokens.create: should not contain /, +, or =', t => {
   t.plan(3000)
 
-  const secret = new Tokens().secretSync()
-
   for (let i = 0; i < 1000; i++) {
-    t.not(new Tokens().create(secret).includes('/'))
-    t.not(new Tokens().create(secret).includes('+'))
-    t.not(new Tokens().create(secret).includes('='))
+    t.not(new Tokens().create(new Tokens().secretSync()).includes('/'))
+    t.not(new Tokens().create(new Tokens().secretSync()).includes('+'))
+    t.not(new Tokens().create(new Tokens().secretSync()).includes('='))
   }
 })
 
 test('Tokens.create: should not collide', t => {
   t.plan(1000)
 
-  const secret = new Tokens().secretSync()
   const tokenSet = new Set()
 
   for (let i = 0; i < 1000; i++) {
-    const token = new Tokens().create(secret)
+    const token = new Tokens().create(new Tokens().secretSync())
     t.not(tokenSet.has(token))
     tokenSet.add(token)
   }
