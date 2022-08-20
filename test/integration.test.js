@@ -46,8 +46,7 @@ test('.create() and verify() with validity: should return `false` for tokens wit
   t.plan(1)
 
   const secret = new Tokens().secretSync()
-  let token = new Tokens({ validity: 3600 }).create(secret)
-  token = token.substring(token.indexOf('-') + 1)
+  const token = new Tokens().create(secret)
 
   t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
 })
@@ -92,8 +91,34 @@ test('.create() and verify() with user info: should return `false` for tokens wi
   t.plan(1)
 
   const secret = new Tokens().secretSync()
-  let token = new Tokens({ userInfo: true }).create(secret, 'foo')
-  token = token.substring(token.indexOf('-') + 1)
+  const token = new Tokens({ userInfo: false }).create(secret)
+
+  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
+})
+
+test('.create() and verify() with validity: should return `false` for edge case', t => {
+  t.plan(1)
+
+  const secret = 'EA3SsAG5xtf42T6JJ7AbG7dj'
+  const token = 'Sp5S2HvW-VV0ZStW3LNhD9ELehQVwzTBK7Is'
+
+  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
+})
+
+test('.create() and verify() with user info: should return false for edge case', t => {
+  t.plan(1)
+
+  const secret = 'VotAvu5relpVeoVGif78oCjf'
+  const token = '5Zmd5CxB-5jfruZ8pbOXRrtSCWFZhCaTFdMk'
+
+  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
+})
+
+test('.create() and verify() with user info: should return false for edge case', t => {
+  t.plan(1)
+
+  const secret = '5ZbtVlGipiWKCS028ySrZJjk'
+  const token = 'PFPrCHKG-L_2yksIX8xmWpcnV-QJGmsndHC8'
 
   t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
 })

@@ -42,12 +42,50 @@ test('Tokens.create: should always be the same length', t => {
 })
 
 test('Tokens.create: should not contain /, +, or =', t => {
-  t.plan(3000)
+  t.plan(4000)
 
   for (let i = 0; i < 1000; i++) {
-    t.not(new Tokens().create(new Tokens().secretSync()).includes('/'))
-    t.not(new Tokens().create(new Tokens().secretSync()).includes('+'))
-    t.not(new Tokens().create(new Tokens().secretSync()).includes('='))
+    const token = new Tokens().create(new Tokens().secretSync())
+    t.not(token.includes('/'))
+    t.not(token.includes('+'))
+    t.not(token.includes('='))
+    t.ok(token.split('-').length - 1 >= 1, token)
+  }
+})
+
+test('Tokens.create: with userInfo should not contain /, +, or =', t => {
+  t.plan(4000)
+
+  for (let i = 0; i < 1000; i++) {
+    const token = new Tokens({ userInfo: true }).create(new Tokens().secretSync(), 'foo')
+    t.not(token.includes('/'))
+    t.not(token.includes('+'))
+    t.not(token.includes('='))
+    t.ok(token.split('-').length - 1 >= 2, token)
+  }
+})
+
+test('Tokens.create: with validity should not contain /, +, or =', t => {
+  t.plan(4000)
+
+  for (let i = 0; i < 1000; i++) {
+    const token = new Tokens({ validity: 3600 }).create(new Tokens().secretSync())
+    t.not(token.includes('/'))
+    t.not(token.includes('+'))
+    t.not(token.includes('='))
+    t.ok(token.split('-').length - 1 >= 2, token)
+  }
+})
+
+test('Tokens.create: with validity and userInfo should not contain /, +, or =', t => {
+  t.plan(4000)
+
+  for (let i = 0; i < 1000; i++) {
+    const token = new Tokens({ validity: 3600, userInfo: true }).create(new Tokens().secretSync(), 'foo')
+    t.not(token.includes('/'))
+    t.not(token.includes('+'))
+    t.not(token.includes('='))
+    t.ok(token.split('-').length - 1 >= 3, token)
   }
 })
 
