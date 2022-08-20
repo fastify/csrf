@@ -1,3 +1,5 @@
+'use strict'
+
 const isEncoding = Buffer.isEncoding
 Buffer.isEncoding = function (encoding) {
   if (encoding !== 'base64url') {
