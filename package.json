@@ -23,7 +23,7 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-markdown": "^3.0.0",
-    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-promise": "^6.0.0",
     "tap": "^16.3.0",
     "tsd": "^0.22.0"
