@@ -3,6 +3,8 @@
   "description": "primary logic behind csrf tokens",
   "version": "5.1.0",
   "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
+  "main": "index.js",
+  "types": "types/index.d.ts",
   "contributors": [
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
     "Matteo Collina <hello@matteocollina.com"
@@ -16,33 +18,19 @@
     "url": "https://github.com/fastify/csrf/issues"
   },
   "homepage": "https://github.com/fastify/csrf#readme",
+  "scripts": {
+    "bench": "node benchmark/index.js",
+    "lint": "standard",
+    "test": "npm run test:unit && npm run test:typescript",
+    "test:unit": "tap",
+    "test:typescript": "tsd"
+  },
   "devDependencies": {
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "eslint": "^8.0.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-markdown": "^3.0.0",
-    "eslint-plugin-n": "^15.2.4",
-    "eslint-plugin-promise": "^6.0.0",
+    "standard": "^17.0.0",
     "tap": "^16.3.0",
     "tsd": "^0.22.0"
-  },
-  "types": "types/index.d.ts",
-  "files": [
-    "LICENSE",
-    "README.md",
-    "types/index.d.ts",
-    "index.js"
-  ],
-  "scripts": {
-    "bench": "node benchmark/index.js",
-    "lint": "eslint --plugin markdown --ext js,md .",
-    "test": "npm run test:unit && npm run test:types",
-    "test:unit": "tap",
-    "test-ci": "nyc --reporter=text npm run test:unit",
-    "test:coverage": "tap --coverage-report=html",
-    "test:types": "tsd"
   },
   "keywords": [
     "csrf",

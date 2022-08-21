@@ -1,5 +1,9 @@
 # CSRF
 
+![CI](https://github.com/fastify/csrf/workflows/CI/badge.svg)
+[![NPM version](https://img.shields.io/npm/v/@fastify/csrf.svg?style=flat)](https://www.npmjs.com/package/@fastify/csrf)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
+
 Logic behind CSRF token creation and verification.
 
 Read [Understanding-CSRF](https://github.com/pillarjs/understanding-csrf)

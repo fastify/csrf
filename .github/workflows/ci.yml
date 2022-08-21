@@ -1,4 +1,4 @@
-name: Node.js CI
+name: CI
 
 on:
   push:
@@ -14,6 +14,7 @@ jobs:
   test:
     uses: fastify/workflows/.github/workflows/plugins-ci.yml@v3
     with:
+      license-check: true
       lint: true
 
   
