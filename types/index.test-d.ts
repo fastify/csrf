@@ -5,6 +5,8 @@ Tokens();
 new Tokens();
 Tokens({});
 new Tokens({});
+Tokens({ algorithm: 'sha1' });
+Tokens({ algorithm: 'sha256' });
 Tokens({ saltLength: 10 });
 Tokens({ secretLength: 10 });
 Tokens({ userInfo: true });
