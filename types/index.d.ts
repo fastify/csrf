@@ -40,7 +40,7 @@ export type SecretCallback = (err: Error | null, secret: string) => void;
 export interface Options {
   /**
    * The algorithm used to generate the token
-   * @default sha1
+   * @default sha256
    */
   algorithm?: string;
 

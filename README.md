@@ -50,7 +50,7 @@ Tokens accepts these properties in the options object.
 
 ##### algorithm
 
-The hash-algorithm to generate the token. Defaults to `sha1`.
+The hash-algorithm to generate the token. Defaults to `sha256`.
 
 ##### saltLength
 
