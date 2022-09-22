@@ -123,22 +123,22 @@ test('.create() and verify() with user info: should return false for edge case',
   t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
 })
 
-test('.create() and verify() with validity: should use by default sha1', t => {
+test('.create() and verify() with validity: should use by default sha256 as algorithm', t => {
   t.plan(2)
 
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foobar')
 
-  t.equal(token.length, 64)
-  t.equal(new Tokens({ userInfo: true, algorithm: 'sha1' }).verify(secret, token, 'foobar'), true)
+  t.equal(token.length, 96)
+  t.equal(new Tokens({ userInfo: true, algorithm: 'sha256' }).verify(secret, token, 'foobar'), true)
 })
 
-test('.create() and verify() with validity: should return `false` for edge case', t => {
+test('.create() and verify() with validity: should be able to set sha1 as algorithm', t => {
   t.plan(2)
 
   const secret = new Tokens().secretSync()
-  const token = new Tokens({ userInfo: true, algorithm: 'sha256' }).create(secret, 'foobar')
+  const token = new Tokens({ userInfo: true, algorithm: 'sha1' }).create(secret, 'foobar')
 
-  t.equal(token.length, 96)
-  t.equal(new Tokens({ userInfo: true, algorithm: 'sha256' }).verify(secret, token, 'foobar'), true)
+  t.equal(token.length, 64)
+  t.equal(new Tokens({ userInfo: true, algorithm: 'sha1' }).verify(secret, token, 'foobar'), true)
 })

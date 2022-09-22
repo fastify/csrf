@@ -30,7 +30,7 @@ function Tokens (options) {
 
   const algorithm = opts.algorithm !== undefined
     ? opts.algorithm
-    : 'sha1'
+    : 'sha256'
 
   try {
     crypto
