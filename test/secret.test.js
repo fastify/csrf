@@ -79,7 +79,8 @@ test('Tokens.secret: should handle error, Promise', t => {
     crypto: {
       randomBytes: (_size, cb) => {
         cb(new Error('oh no'))
-      }
+      },
+      createHash: require('crypto').createHash
     }
   })
 
@@ -96,7 +97,8 @@ test('Tokens.secret: should handle error, callback', t => {
     crypto: {
       randomBytes: (size, cb) => {
         cb(new Error('oh no'))
-      }
+      },
+      createHash: require('crypto').createHash
     }
   })
 

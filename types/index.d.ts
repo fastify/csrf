@@ -39,6 +39,12 @@ export type SecretCallback = (err: Error | null, secret: string) => void;
 
 export interface Options {
   /**
+   * The algorithm used to generate the token
+   * @default sha256
+   */
+  algorithm?: string;
+
+  /**
    * The string length of the salt
    * 
    * @default 8

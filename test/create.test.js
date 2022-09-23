@@ -34,7 +34,7 @@ test('Tokens.create: should always be the same length', t => {
   const secret = new Tokens().secretSync()
   const tokenLength = new Tokens().create(secret).length
 
-  t.equal(tokenLength, 36)
+  t.equal(tokenLength, 52)
 
   for (let i = 0; i < 1000; i++) {
     t.equal(new Tokens().create(secret).length, tokenLength)

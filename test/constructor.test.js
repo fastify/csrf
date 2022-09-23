@@ -57,3 +57,8 @@ test('Tokens.constructor: instantiating Tokens without new creates still the Tok
   t.plan(1)
   t.ok(Tokens() instanceof Tokens, true)
 })
+
+test('Tokens.constructor: instantiating Tokens with "invalid" for algorithm should throw', t => {
+  t.plan(1)
+  t.throws(() => new Tokens({ algorithm: 'invalid' }), new TypeError('option algorithm must be a supported hash-algorithm'))
+})

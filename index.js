@@ -28,6 +28,17 @@ function Tokens (options) {
 
   const opts = options || {}
 
+  const algorithm = opts.algorithm !== undefined
+    ? opts.algorithm
+    : 'sha256'
+
+  try {
+    crypto
+      .createHash(algorithm)
+  } catch (err) {
+    throw new TypeError('option algorithm must be a supported hash-algorithm')
+  }
+
   const saltLength = opts.saltLength !== undefined
     ? opts.saltLength
     : 8
@@ -60,6 +71,7 @@ function Tokens (options) {
     throw new TypeError('option userInfo must be a boolean')
   }
 
+  this.algorithm = algorithm
   this.saltLength = saltLength
   this.saltGenerator = saltGenerator(saltLength)
   this.secretLength = secretLength
@@ -88,7 +100,7 @@ Tokens.prototype.create = function create (secret, userInfo) {
     }
   }
 
-  return this._tokenize(secret, this.saltGenerator(), date, userInfo)
+  return this._tokenize(secret, this.saltGenerator(), date, userInfo, this.algorithm)
 }
 
 /**
@@ -186,7 +198,7 @@ Tokens.prototype.secretSync = Buffer.isEncoding('base64url')
  */
 
 Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
-  ? function _tokenize (secret, salt, date, userInfo) {
+  ? function _tokenize (secret, salt, date, userInfo, algorithm) {
     let toHash = ''
 
     if (date !== null) {
@@ -195,7 +207,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
 
     if (typeof userInfo === 'string') {
       toHash += crypto
-        .createHash('sha1')
+        .createHash(algorithm)
         .update(userInfo)
         .digest('base64url')
         .replace(MINUS_GLOBAL_REGEXP, '_') + '-'
@@ -204,11 +216,11 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     toHash += salt
 
     return toHash + '-' + crypto
-      .createHash('sha1')
+      .createHash(algorithm)
       .update(toHash + '-' + secret, 'ascii')
       .digest('base64url')
   }
-  : function _tokenize (secret, salt, date, userInfo) {
+  : function _tokenize (secret, salt, date, userInfo, algorithm) {
     let toHash = ''
 
     if (date !== null) {
@@ -217,7 +229,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
 
     if (typeof userInfo === 'string') {
       toHash += crypto
-        .createHash('sha1')
+        .createHash(algorithm)
         .update(userInfo)
         .digest('base64')
         .replace(PLUS_SLASH_GLOBAL_REGEXP, '_')
@@ -227,7 +239,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     toHash += salt
 
     return toHash + '-' + crypto
-      .createHash('sha1')
+      .createHash(algorithm)
       .update(toHash + '-' + secret, 'ascii')
       .digest('base64')
       .replace(PLUS_GLOBAL_REGEXP, '-')
@@ -294,7 +306,7 @@ Tokens.prototype.verify = function verify (secret, token, userInfo) {
   const salt = token.slice(curIdx, nextIdx)
 
   const actual = Buffer.from(token)
-  const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo))
+  const expected = Buffer.from(this._tokenize(secret, salt, date, userInfo, this.algorithm))
 
   // to avoid the exposure if the provided value has the correct length, we call
   // timingSafeEqual with the actual value. The additional length check itself is

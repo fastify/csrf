@@ -48,6 +48,10 @@ optional and will just use all defaults if missing.
 
 Tokens accepts these properties in the options object.
 
+##### algorithm
+
+The hash-algorithm to generate the token. Defaults to `sha256`.
+
 ##### saltLength
 
 The length of the internal salt to use, in characters. Internally, the salt
