@@ -1,7 +1,7 @@
 {
   "name": "@fastify/csrf",
   "description": "primary logic behind csrf tokens",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
   "main": "index.js",
   "types": "types/index.d.ts",
