@@ -1,5 +1,5 @@
 import { expectError, expectType } from "tsd";
-import { Tokens } from ".";
+import { Tokens } from "..";
 
 Tokens();
 new Tokens();
