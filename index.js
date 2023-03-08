@@ -77,7 +77,7 @@ function Tokens (options) {
     try {
       crypto.createHmac(algorithm, hmacKey)
     } catch (err) {
-      throw new TypeError('option hmacKey must be a support hmac key')
+      throw new TypeError('option hmacKey must be a supported hmac key')
     }
   }
 

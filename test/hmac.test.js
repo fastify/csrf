@@ -5,7 +5,7 @@ const Tokens = require('..')
 
 test('Tokens.constructor: instantiating Tokens with a non string hmacKey should throw', t => {
   t.plan(1)
-  t.throws(() => new Tokens({ hmacKey: 123 }), new TypeError('option hmacKey must be a support hmac key'))
+  t.throws(() => new Tokens({ hmacKey: 123 }), new TypeError('option hmacKey must be a supported hmac key'))
 })
 
 test('Tokens.secret: should create a secret', t => {
