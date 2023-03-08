@@ -71,12 +71,23 @@ function Tokens (options) {
     throw new TypeError('option userInfo must be a boolean')
   }
 
+  const hmacKey = opts.hmacKey
+
+  if (hmacKey) {
+    try {
+      crypto.createHmac(algorithm, hmacKey)
+    } catch (err) {
+      throw new TypeError('option hmacKey must be a support hmac key')
+    }
+  }
+
   this.algorithm = algorithm
   this.saltLength = saltLength
   this.saltGenerator = saltGenerator(saltLength)
   this.secretLength = secretLength
   this.validity = validity
   this.userInfo = userInfo
+  this.hmacKey = hmacKey
 }
 
 /**
@@ -206,19 +217,19 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      toHash += crypto
-        .createHash(algorithm)
-        .update(userInfo)
-        .digest('base64url')
-        .replace(MINUS_GLOBAL_REGEXP, '_') + '-'
+      toHash +=
+        hashingStrategy(algorithm, this.hmacKey)
+          .update(userInfo)
+          .digest('base64url')
+          .replace(MINUS_GLOBAL_REGEXP, '_') + '-'
     }
 
     toHash += salt
 
-    return toHash + '-' + crypto
-      .createHash(algorithm)
-      .update(toHash + '-' + secret, 'ascii')
-      .digest('base64url')
+    return toHash + '-' +
+      hashingStrategy(algorithm, this.hmacKey)
+        .update(toHash + '-' + secret, 'ascii')
+        .digest('base64url')
   }
   : function _tokenize (secret, salt, date, userInfo, algorithm) {
     let toHash = ''
@@ -228,8 +239,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
     }
 
     if (typeof userInfo === 'string') {
-      toHash += crypto
-        .createHash(algorithm)
+      toHash += hashingStrategy(algorithm, this.hmacKey)
         .update(userInfo)
         .digest('base64')
         .replace(PLUS_SLASH_GLOBAL_REGEXP, '_')
@@ -238,8 +248,7 @@ Tokens.prototype._tokenize = Buffer.isEncoding('base64url')
 
     toHash += salt
 
-    return toHash + '-' + crypto
-      .createHash(algorithm)
+    return toHash + '-' + hashingStrategy(algorithm, this.hmacKey)
       .update(toHash + '-' + secret, 'ascii')
       .digest('base64')
       .replace(PLUS_GLOBAL_REGEXP, '-')
@@ -335,6 +344,13 @@ function saltGenerator (saltLength) {
   fnBody.push('return ' + salt.join('+'))
   fnBody.push('}')
   return new Function(fnBody.join(''))() // eslint-disable-line no-new-func
+}
+
+function hashingStrategy (algorithm, key) {
+  if (key) {
+    return crypto.createHmac(algorithm, key)
+  }
+  return crypto.createHash(algorithm)
 }
 
 module.exports = Tokens
