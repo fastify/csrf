@@ -75,7 +75,8 @@ function Tokens (options) {
 
   if (hmacKey) {
     try {
-      crypto.createHmac(algorithm, hmacKey)
+      // validate if the hmacKey is a valid format
+      hashingStrategy(algorithm, hmacKey)
     } catch (err) {
       throw new TypeError('option hmacKey must be a supported hmac key')
     }
