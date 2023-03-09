@@ -70,7 +70,7 @@ Require user-specific information in `tokens.create()` and
 
 ##### hmacKey
 
-The HMAC key used to generate the cryptographic HMAC hash.
+When set, the `hmacKey` is used to generate the cryptographic HMAC hash instead of the default hash function.
 
 ##### validity
 
