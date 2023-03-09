@@ -26,6 +26,7 @@
     "test:typescript": "tsd"
   },
   "devDependencies": {
+    "@types/node": "^18.14.6",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
     "standard": "^17.0.0",

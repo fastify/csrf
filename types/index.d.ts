@@ -79,11 +79,28 @@ declare namespace Tokens {
      * @default false
      */
     userInfo?: boolean;
+
+    /**
+     * The HMAC key used to generate the cryptographic HMAC hash
+     * 
+     */
+    hmacKey?: string | ArrayBuffer | Buffer | TypedArray | DataView | CryptoKey;
   }
 
   export const Tokens: TokensConstructor
   export { Tokens as default }
 }
+
+type TypedArray =
+  | Int8Array
+  | Uint8Array
+  | Uint8ClampedArray
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array;
 
 declare function Tokens(...params: Parameters<TokensConstructor>): ReturnType<TokensConstructor>
 export = Tokens

@@ -68,6 +68,10 @@ bytes, not the length of the base-64 string. Defaults to `18` bytes.
 Require user-specific information in `tokens.create()` and
 `tokens.verify()`.
 
+##### hmacKey
+
+When set, the `hmacKey` is used to generate the cryptographic HMAC hash instead of the default hash function.
+
 ##### validity
 
 The maximum validity of the token to generate, in milliseconds. Note that the epoch  is
