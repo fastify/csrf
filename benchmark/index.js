@@ -1,6 +1,6 @@
-const fs = require('fs')
-const path = require('path')
-const spawn = require('child_process').spawn
+const fs = require('node:fs')
+const path = require('node:path')
+const spawn = require('node:child_process').spawn
 
 const exe = process.argv[0]
 const cwd = process.cwd()

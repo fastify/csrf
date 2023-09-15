@@ -8,7 +8,7 @@
  * MIT Licensed
  */
 
-const crypto = require('crypto')
+const crypto = require('node:crypto')
 
 /**
  * Token generation/verification class.
