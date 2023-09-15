@@ -76,7 +76,7 @@ test('Tokens.secret: should handle error, Promise', t => {
   t.plan(2)
 
   const Tokens = mock('..', {
-    crypto: {
+    'node:crypto': {
       randomBytes: (_size, cb) => {
         cb(new Error('oh no'))
       },
@@ -94,7 +94,7 @@ test('Tokens.secret: should handle error, callback', t => {
   t.plan(2)
 
   const Tokens = mock('..', {
-    crypto: {
+    'node:crypto': {
       randomBytes: (size, cb) => {
         cb(new Error('oh no'))
       },
