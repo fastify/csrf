@@ -1,6 +1,6 @@
 'use strict'
 
-const { test, mock } = require('tap')
+const { test, mockRequire } = require('tap')
 const Tokens = require('..')
 
 test('Tokens.secret: should reject bad callback', t => {
@@ -75,7 +75,7 @@ test('Tokens.secret: should not contain /, +, or =, callback', t => {
 test('Tokens.secret: should handle error, Promise', t => {
   t.plan(2)
 
-  const Tokens = mock('..', {
+  const Tokens = mockRequire('..', {
     'node:crypto': {
       randomBytes: (_size, cb) => {
         cb(new Error('oh no'))
@@ -93,7 +93,7 @@ test('Tokens.secret: should handle error, Promise', t => {
 test('Tokens.secret: should handle error, callback', t => {
   t.plan(2)
 
-  const Tokens = mock('..', {
+  const Tokens = mockRequire('..', {
     'node:crypto': {
       randomBytes: (size, cb) => {
         cb(new Error('oh no'))
