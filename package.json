@@ -27,6 +27,7 @@
     "test:typescript": "tsd"
   },
   "devDependencies": {
+    "@fastify/pre-commit": "^2.1.0",
     "@types/node": "^20.12.7",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
