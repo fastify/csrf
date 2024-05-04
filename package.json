@@ -27,11 +27,11 @@
     "test:typescript": "tsd"
   },
   "devDependencies": {
-    "@types/node": "^20.1.0",
+    "@types/node": "^20.11.30",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "standard": "^17.0.0",
-    "tap": "^16.3.0",
+    "standard": "^17.1.0",
+    "tap": "^18.7.1",
     "tsd": "^0.31.0"
   },
   "keywords": [
