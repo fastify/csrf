@@ -21,14 +21,14 @@ suite.add({
   name: 'verify - valid',
   minSamples: 100,
   setup: 'token = tokens.create(secret)',
-  fn: 'var valid = tokens.verify(secret, token)'
+  fn: 'const valid = tokens.verify(secret, token)'
 })
 
 suite.add({
   name: 'verify - invalid',
   minSamples: 100,
   setup: 'token = tokens.create(secret).replace(/[a-zA-Z]/g, "=")',
-  fn: 'var valid = tokens.verify(secret, token)'
+  fn: 'const valid = tokens.verify(secret, token)'
 })
 
 suite.on('start', function onCycle (event) {

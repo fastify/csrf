@@ -19,7 +19,7 @@ const suite = new benchmark.Suite()
 suite.add({
   name: 'secretSync',
   minSamples: 100,
-  fn: 'var secret = tokens.secretSync()'
+  fn: 'const secret = tokens.secretSync()'
 })
 
 suite.add({

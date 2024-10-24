@@ -20,7 +20,7 @@ const suite = new benchmark.Suite()
 suite.add({
   name: 'create',
   minSamples: 100,
-  fn: 'var token = tokens.create(secret)'
+  fn: 'const token = tokens.create(secret)'
 })
 
 suite.on('start', function onCycle (event) {
