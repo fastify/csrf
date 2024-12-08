@@ -1,8 +1,8 @@
 interface TokensConstructor {
-  (options?: Tokens.Options & { userInfo: true}): Tokens.TokensUserinfo;
+  (options?: Tokens.Options & { userInfo: true }): Tokens.TokensUserinfo;
   (options?: Tokens.Options): Tokens.TokensSimple;
 
-  new(options?: Tokens.Options & { userInfo: true}): Tokens.TokensUserinfo;
+  new(options?: Tokens.Options & { userInfo: true }): Tokens.TokensUserinfo;
   new(options?: Tokens.Options): Tokens.TokensSimple;
 }
 
@@ -11,8 +11,8 @@ declare namespace Tokens {
     /**
      * Create a new secret key.
      */
-     secret(callback: SecretCallback): void;
-     secret(): Promise<string>;
+    secret(callback: SecretCallback): void;
+    secret(): Promise<string>;
 
     /**
      * Create a new secret key synchronously.
@@ -44,7 +44,7 @@ declare namespace Tokens {
     verify(secret: string, token: string, userInfo: string): boolean;
   }
 
-  export type SecretCallback = (err: Error | null, secret: string) => void;
+  export type SecretCallback = (err: Error | null, secret: string) => void
 
   export interface Options {
     /**
@@ -100,7 +100,7 @@ type TypedArray =
   | Int32Array
   | Uint32Array
   | Float32Array
-  | Float64Array;
+  | Float64Array
 
-declare function Tokens(...params: Parameters<TokensConstructor>): ReturnType<TokensConstructor>
+declare function Tokens (...params: Parameters<TokensConstructor>): ReturnType<TokensConstructor>
 export = Tokens

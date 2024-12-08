@@ -21,7 +21,8 @@
   "homepage": "https://github.com/fastify/csrf#readme",
   "scripts": {
     "bench": "node benchmark/index.js",
-    "lint": "standard",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "npm run test:unit && npm run test:typescript",
     "test:unit": "tap",
     "test:typescript": "tsd"
@@ -30,7 +31,7 @@
     "@types/node": "^22.0.0",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "standard": "^17.1.0",
+    "neostandard": "^0.11.9",
     "tap": "^18.7.1",
     "tsd": "^0.31.0"
   },
