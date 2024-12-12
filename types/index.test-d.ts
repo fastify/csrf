@@ -1,3 +1,4 @@
+/* eslint-disable no-new -- Testing constructor types, so no need to assign */
 import { expectError, expectType } from 'tsd'
 import { Tokens } from '..'
 
