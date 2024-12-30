@@ -86,7 +86,7 @@ test('Tokens.secret: should handle error, Promise', t => {
 
   new Tokens().secret().catch(err => {
     t.ok(err instanceof Error)
-    t.ok(err.message = 'oh no')
+    t.ok(err.message === 'oh no')
   })
 })
 
@@ -104,6 +104,6 @@ test('Tokens.secret: should handle error, callback', t => {
 
   new Tokens().secret(function (err, _secret) {
     t.ok(err instanceof Error)
-    t.ok(err.message = 'oh no')
+    t.ok(err.message === 'oh no')
   })
 })
