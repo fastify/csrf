@@ -35,7 +35,7 @@ function Tokens (options) {
   try {
     crypto
       .createHash(algorithm)
-  } catch (err) {
+  } catch {
     throw new TypeError('option algorithm must be a supported hash-algorithm')
   }
 
@@ -77,7 +77,7 @@ function Tokens (options) {
     try {
       // validate if the hmacKey is a valid format
       hashingStrategy(algorithm, hmacKey)
-    } catch (err) {
+    } catch {
       throw new TypeError('option hmacKey must be a supported hmac key')
     }
   }
