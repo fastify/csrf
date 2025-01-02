@@ -28,7 +28,7 @@ $ npm i @fastify/csrf
 ### TypeScript
 
 This module includes a [TypeScript](https://www.typescriptlang.org/)
-declaration file to enable auto complete in compatible editors and type
+declaration file to enable auto-complete in compatible editors and type
 information for TypeScript projects.
 
 ## API
@@ -46,7 +46,7 @@ optional and will just use all defaults if missing.
 
 #### Options
 
-Tokens accepts these properties in the options object.
+Tokens accept these properties in the options object.
 
 ##### algorithm
 
@@ -74,7 +74,7 @@ When set, the `hmacKey` is used to generate the cryptographic HMAC hash instead 
 
 ##### validity
 
-The maximum validity of the token to generate, in milliseconds. Note that the epoch  is
+The maximum validity of the token to generate, in milliseconds. Note that the epoch is
 passed around base-36 encoded. Defaults to `0` milliseconds (disabled).
 
 #### tokens.create(secret[, userInfo])
@@ -94,7 +94,7 @@ const token = tokens.create(secret)
 The `userInfo` parameter can be used to protect against cookie tossing
 attacks (and similar) when the application is deployed with untrusted
 subdomains. It will encode some user-specific information within the
-token. It is used only if `userInfo: true`  is passed as option in the
+token. It is used only if `userInfo: true` is passed to the
 constructor.
 
 #### tokens.secret(callback)
@@ -108,7 +108,7 @@ user. The secret should be at least per user.
 ```js
 tokens.secret(function (err, secret) {
   if (err) throw err
-  // do something with the secret
+  // Do something with the secret
 })
 ```
 
@@ -124,7 +124,7 @@ Asynchronously create a new `secret` and return a `Promise`. Please see
 
 ```js
 tokens.secret().then(function (secret) {
-  // do something with the secret
+  // Do something with the secret
 })
 ```
 
@@ -152,7 +152,7 @@ if (!tokens.verify(secret, token)) {
 }
 ```
 
-The `userInfo` paramater is required if `userInfo: true` was configured
+The `userInfo` parameter is required if `userInfo: true` was configured
 during initialization. The user-specific information must match what was
 passed in `tokens.create()`.
 
