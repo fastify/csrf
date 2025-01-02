@@ -38,7 +38,7 @@ if (global.Promise) {
   })
 }
 
-suite.on('start', function onCycle (event) {
+suite.on('start', function onCycle () {
   process.stdout.write('  secret\n\n')
 })
 

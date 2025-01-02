@@ -31,7 +31,7 @@ suite.add({
   fn: 'const valid = tokens.verify(secret, token)'
 })
 
-suite.on('start', function onCycle (event) {
+suite.on('start', function onCycle () {
   process.stdout.write('  verify\n\n')
 })
 

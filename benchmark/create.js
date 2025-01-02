@@ -23,7 +23,7 @@ suite.add({
   fn: 'const token = tokens.create(secret)'
 })
 
-suite.on('start', function onCycle (event) {
+suite.on('start', function onCycle () {
   process.stdout.write('  create\n\n')
 })
 
