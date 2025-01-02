@@ -158,4 +158,4 @@ passed in `tokens.create()`.
 
 ## License
 
-[MIT](LICENSE)
+Licensed under [MIT](./LICENSE).
