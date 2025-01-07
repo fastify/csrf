@@ -1,21 +1,27 @@
 'use strict'
 
-const test = require('tap').test
+const { test } = require('node:test')
 const Tokens = require('..')
 
 test('Tokens.constructor: instantiating Tokens with a non string hmacKey should throw', t => {
   t.plan(1)
-  t.throws(() => new Tokens({ hmacKey: 123 }), new TypeError('option hmacKey must be a supported hmac key'))
+  t.assert.throws(() => new Tokens({ hmacKey: 123 }), new TypeError('option hmacKey must be a supported hmac key'))
 })
 
 test('Tokens.secret: should create a secret', t => {
   t.plan(3)
 
+  const { promise, resolve } = Promise.withResolvers()
+
   new Tokens({ hmacKey: 'foo' }).secret(function (err, secret) {
-    t.error(err)
-    t.type(secret, 'string')
-    t.equal(secret.length, 24)
+    t.assert.ifError(err)
+    t.assert.ok(typeof secret === 'string')
+    t.assert.deepStrictEqual(secret.length, 24)
+
+    resolve()
   })
+
+  return promise
 })
 
 test('Tokens.verify: should return `true` with valid tokens', t => {
@@ -24,7 +30,7 @@ test('Tokens.verify: should return `true` with valid tokens', t => {
   const secret = new Tokens({ hmacKey: 'foo' }).secretSync()
   const token = new Tokens({ hmacKey: 'foo' }).create(secret)
 
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(secret, token), true)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(secret, token), true)
 })
 
 test('Tokens.verify: should return `false` with invalid secret', t => {
@@ -33,11 +39,11 @@ test('Tokens.verify: should return `false` with invalid secret', t => {
   const secret = new Tokens({ hmacKey: 'foo' }).secretSync()
   const token = new Tokens({ hmacKey: 'foo' }).create(secret)
 
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(new Tokens().secretSync(), token), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify('invalid', token), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify([]), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify('invalid'), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(new Tokens().secretSync(), token), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify('invalid', token), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify([]), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify('invalid'), false)
 })
 
 test('Tokens.verify: should return `false` with invalid tokens', t => {
@@ -46,10 +52,10 @@ test('Tokens.verify: should return `false` with invalid tokens', t => {
   const secret = new Tokens({ hmacKey: 'foo' }).secretSync()
   const token = new Tokens({ hmacKey: 'foo' }).create(secret)
 
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify('invalid', token), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(secret, undefined), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(secret, []), false)
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(secret, 'hi'), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify('invalid', token), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(secret, undefined), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(secret, []), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(secret, 'hi'), false)
 })
 
 test('Tokens.verify: should return `false` with different hmac key', t => {
@@ -58,6 +64,6 @@ test('Tokens.verify: should return `false` with different hmac key', t => {
   const secret = new Tokens({ hmacKey: 'foo' }).secretSync()
   const token = new Tokens({ hmacKey: 'foo' }).create(secret)
 
-  t.equal(new Tokens({ hmacKey: 'foo' }).verify(secret, token), true)
-  t.equal(new Tokens({ hmacKey: 'bar' }).verify(secret, token), false)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'foo' }).verify(secret, token), true)
+  t.assert.deepStrictEqual(new Tokens({ hmacKey: 'bar' }).verify(secret, token), false)
 })

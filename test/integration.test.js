@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('tap').test
+const { test } = require('node:test')
 const Tokens = require('..')
 
 test('.create() and verify() with validity: should return `true` with valid tokens', t => {
@@ -9,7 +9,7 @@ test('.create() and verify() with validity: should return `true` with valid toke
   const secret = new Tokens().secretSync()
   const token = new Tokens({ validity: 3600 }).create(secret)
 
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), true)
+  t.assert.deepStrictEqual(new Tokens({ validity: 3600 }).verify(secret, token), true)
 })
 
 test('.create() and verify() with validity: should return `false` if current time is outside the validity interval', t => {
@@ -17,14 +17,14 @@ test('.create() and verify() with validity: should return `false` if current tim
 
   const fn = Date.now
   const now = Date.now()
-  t.teardown(() => { Date.now = fn })
+  t.after(() => { Date.now = fn })
 
   const secret = new Tokens().secretSync()
   Date.now = function () { return now }
   const token = new Tokens({ validity: 3600 }).create(secret)
 
   Date.now = function () { return now + 3601 }
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
+  t.assert.deepStrictEqual(new Tokens({ validity: 3600 }).verify(secret, token), false)
 })
 
 test('.create() and verify() with validity: should return `true` if current time is at the max of the validity interval', t => {
@@ -32,14 +32,14 @@ test('.create() and verify() with validity: should return `true` if current time
 
   const fn = Date.now
   const now = Date.now()
-  t.teardown(() => { Date.now = fn })
+  t.after(() => { Date.now = fn })
 
   Date.now = function () { return now }
   const secret = new Tokens().secretSync()
   Date.now = function () { return now + 3600 }
   const token = new Tokens({ validity: 3600 }).create(secret)
 
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), true, { secret, token, now })
+  t.assert.deepStrictEqual(new Tokens({ validity: 3600 }).verify(secret, token), true, { secret, token, now })
 })
 
 test('.create() and verify() with validity: should return `false` for tokens with no date', t => {
@@ -48,7 +48,7 @@ test('.create() and verify() with validity: should return `false` for tokens wit
   const secret = new Tokens().secretSync()
   const token = new Tokens().create(secret)
 
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
+  t.assert.deepStrictEqual(new Tokens({ validity: 3600 }).verify(secret, token), false)
 })
 
 test('.create() and verify() with user info: should return `true` with valid tokens', t => {
@@ -57,7 +57,7 @@ test('.create() and verify() with user info: should return `true` with valid tok
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foobar')
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foobar'), true)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, 'foobar'), true)
 })
 
 test('.create() and verify() with user info: should return `false` if userInfo does not match', t => {
@@ -66,7 +66,7 @@ test('.create() and verify() with user info: should return `false` if userInfo d
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foo')
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foobar'), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, 'foobar'), false)
 })
 
 test('.create() and verify() with user info: should return `false` if userInfo is not set in verify', t => {
@@ -75,7 +75,7 @@ test('.create() and verify() with user info: should return `false` if userInfo i
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foo')
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token), false)
 })
 
 test('.create() and verify() with user info: should return `false` if userInfo is not a string in verify', t => {
@@ -84,7 +84,7 @@ test('.create() and verify() with user info: should return `false` if userInfo i
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foo')
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, {}), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, {}), false)
 })
 
 test('.create() and verify() with user info: should return `false` for tokens with no userInfo', t => {
@@ -93,7 +93,7 @@ test('.create() and verify() with user info: should return `false` for tokens wi
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: false }).create(secret)
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
 })
 
 test('.create() and verify() with validity: should return `false` for edge case', t => {
@@ -102,7 +102,7 @@ test('.create() and verify() with validity: should return `false` for edge case'
   const secret = 'EA3SsAG5xtf42T6JJ7AbG7dj'
   const token = 'Sp5S2HvW-VV0ZStW3LNhD9ELehQVwzTBK7Is'
 
-  t.equal(new Tokens({ validity: 3600 }).verify(secret, token), false)
+  t.assert.deepStrictEqual(new Tokens({ validity: 3600 }).verify(secret, token), false)
 })
 
 test('.create() and verify() with user info: should return false for edge case', t => {
@@ -111,7 +111,7 @@ test('.create() and verify() with user info: should return false for edge case',
   const secret = 'VotAvu5relpVeoVGif78oCjf'
   const token = '5Zmd5CxB-5jfruZ8pbOXRrtSCWFZhCaTFdMk'
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
 })
 
 test('.create() and verify() with user info: should return false for edge case', t => {
@@ -120,7 +120,7 @@ test('.create() and verify() with user info: should return false for edge case',
   const secret = '5ZbtVlGipiWKCS028ySrZJjk'
   const token = 'PFPrCHKG-L_2yksIX8xmWpcnV-QJGmsndHC8'
 
-  t.equal(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true }).verify(secret, token, 'foo'), false)
 })
 
 test('.create() and verify() with validity: should use by default sha256 as algorithm', t => {
@@ -129,8 +129,8 @@ test('.create() and verify() with validity: should use by default sha256 as algo
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true }).create(secret, 'foobar')
 
-  t.equal(token.length, 96)
-  t.equal(new Tokens({ userInfo: true, algorithm: 'sha256' }).verify(secret, token, 'foobar'), true)
+  t.assert.deepStrictEqual(token.length, 96)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true, algorithm: 'sha256' }).verify(secret, token, 'foobar'), true)
 })
 
 test('.create() and verify() with validity: should be able to set sha1 as algorithm', t => {
@@ -139,6 +139,6 @@ test('.create() and verify() with validity: should be able to set sha1 as algori
   const secret = new Tokens().secretSync()
   const token = new Tokens({ userInfo: true, algorithm: 'sha1' }).create(secret, 'foobar')
 
-  t.equal(token.length, 64)
-  t.equal(new Tokens({ userInfo: true, algorithm: 'sha1' }).verify(secret, token, 'foobar'), true)
+  t.assert.deepStrictEqual(token.length, 64)
+  t.assert.deepStrictEqual(new Tokens({ userInfo: true, algorithm: 'sha1' }).verify(secret, token, 'foobar'), true)
 })

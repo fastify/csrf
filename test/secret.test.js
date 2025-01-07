@@ -1,31 +1,39 @@
 'use strict'
 
-const { test, mockRequire } = require('tap')
+const { test, mockRequire } = require('node:test')
 const Tokens = require('..')
+
+require('./polyfill')
 
 test('Tokens.secret: should reject bad callback', t => {
   t.plan(1)
 
-  t.throws(() => new Tokens().secret(42), new TypeError('argument callback must be a function'))
+  t.assert.throws(() => new Tokens().secret(42), new TypeError('argument callback must be a function'))
 })
 
 test('Tokens.secret: should create a secret', t => {
   t.plan(3)
 
+  const { promise, resolve } = Promise.withResolvers()
+
   new Tokens().secret(function (err, secret) {
-    t.error(err)
-    t.type(secret, 'string')
-    t.equal(secret.length, 24)
+    t.assert.ifError(err)
+    t.assert.ok(typeof secret === 'string')
+    t.assert.deepStrictEqual(secret.length, 24)
+
+    resolve()
   })
+
+  return promise
 })
 
-test('Tokens.secret: with global Promise', t => {
+test('Tokens.secret: with global Promise', async t => {
   t.plan(2)
 
-  new Tokens().secret().then(function (secret) {
-    t.type(secret, 'string')
-    t.equal(secret.length, 24)
-  })
+  const secret = await new Tokens().secret()
+
+  t.assert.ok(typeof secret === 'string')
+  t.assert.deepStrictEqual(secret.length, 24)
 })
 
 test('Tokens.secret: without global Promise', t => {
@@ -33,9 +41,9 @@ test('Tokens.secret: without global Promise', t => {
 
   const promise = Promise
   global.Promise = undefined
-  t.teardown(() => { global.Promise = promise })
+  t.after(() => { global.Promise = promise })
 
-  t.throws(() => new Tokens().secret(), new TypeError('argument callback is required'))
+  t.assert.throws(() => new Tokens().secret(), new TypeError('argument callback is required'))
 })
 
 test('Tokens.secret: without global Promise should reject bad callback', t => {
@@ -43,32 +51,37 @@ test('Tokens.secret: without global Promise should reject bad callback', t => {
 
   const promise = Promise
   global.Promise = undefined
-  t.teardown(() => { global.Promise = promise })
-  t.throws(() => new Tokens().secret(42), new TypeError('argument callback must be a function'))
+  t.after(() => { global.Promise = promise })
+  t.assert.throws(() => new Tokens().secret(42), new TypeError('argument callback must be a function'))
 })
 
-test('Tokens.secret: should not contain /, +, or =, Promise', t => {
+test('Tokens.secret: should not contain /, +, or =, Promise', async t => {
   t.plan(3000)
 
   for (let i = 0; i < 1000; i++) {
-    new Tokens().secret().then(function (secret) {
-      t.not(secret.includes('/'))
-      t.not(secret.includes('+'))
-      t.not(secret.includes('='))
-    })
+    const secret = await new Tokens().secret()
+    t.assert.ok(!secret.includes('/'))
+    t.assert.ok(!secret.includes('+'))
+    t.assert.ok(!secret.includes('='))
   }
 })
 
-test('Tokens.secret: should not contain /, +, or =, callback', t => {
+test('Tokens.secret: should not contain /, +, or =, callback', async t => {
   t.plan(4000)
 
   for (let i = 0; i < 1000; i++) {
+    const { promise, resolve } = Promise.withResolvers()
+
     new Tokens().secret(function (err, secret) {
-      t.error(err)
-      t.not(secret.includes('/'))
-      t.not(secret.includes('+'))
-      t.not(secret.includes('='))
+      t.assert.ifError(err)
+      t.assert.ok(!secret.includes('/'))
+      t.assert.ok(!secret.includes('+'))
+      t.assert.ok(!secret.includes('='))
+
+      resolve()
     })
+
+    await promise
   }
 })
 
@@ -85,8 +98,8 @@ test('Tokens.secret: should handle error, Promise', t => {
   })
 
   new Tokens().secret().catch(err => {
-    t.ok(err instanceof Error)
-    t.ok(err.message === 'oh no')
+    t.assert.ok(err instanceof Error)
+    t.assert.ok(err.message === 'oh no')
   })
 })
 
@@ -103,7 +116,7 @@ test('Tokens.secret: should handle error, callback', t => {
   })
 
   new Tokens().secret(function (err, _secret) {
-    t.ok(err instanceof Error)
-    t.ok(err.message === 'oh no')
+    t.assert.ok(err instanceof Error)
+    t.assert.ok(err.message === 'oh no')
   })
 })
