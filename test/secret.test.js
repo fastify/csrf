@@ -1,6 +1,6 @@
 'use strict'
 
-const { test, mockRequire } = require('node:test')
+const { test } = require('node:test')
 const Tokens = require('..')
 
 require('./polyfill')
@@ -85,38 +85,46 @@ test('Tokens.secret: should not contain /, +, or =, callback', async t => {
   }
 })
 
-test('Tokens.secret: should handle error, Promise', t => {
-  t.plan(2)
-
-  const Tokens = mockRequire('..', {
-    'node:crypto': {
-      randomBytes: (_size, cb) => {
-        cb(new Error('oh no'))
-      },
-      createHash: require('node:crypto').createHash
+const mockRandomBytes = (t) => {
+  const crypto = require('node:crypto')
+  let oldCrypto
+  t.before(() => {
+    oldCrypto = crypto.randomBytes.bind(crypto)
+    crypto.randomBytes = (_size, cb) => {
+      cb(new Error('oh no'))
     }
   })
+  t.after(() => {
+    crypto.randomBytes = oldCrypto
+  })
+}
 
-  new Tokens().secret().catch(err => {
+test('Tokens.secret: should handle error, Promise', async t => {
+  t.plan(2)
+
+  mockRandomBytes(t)
+
+  try {
+    await new Tokens().secret()
+  } catch (err) {
     t.assert.ok(err instanceof Error)
     t.assert.ok(err.message === 'oh no')
-  })
+  }
 })
 
 test('Tokens.secret: should handle error, callback', t => {
   t.plan(2)
 
-  const Tokens = mockRequire('..', {
-    'node:crypto': {
-      randomBytes: (size, cb) => {
-        cb(new Error('oh no'))
-      },
-      createHash: require('node:crypto').createHash
-    }
-  })
+  mockRandomBytes(t)
+
+  const { promise, resolve } = Promise.withResolvers()
 
   new Tokens().secret(function (err, _secret) {
     t.assert.ok(err instanceof Error)
     t.assert.ok(err.message === 'oh no')
+
+    resolve()
   })
+
+  return promise
 })
