@@ -3,6 +3,8 @@
 const { test } = require('node:test')
 const Tokens = require('..')
 
+require('./polyfill')
+
 test('Tokens.constructor: instantiating Tokens with a non string hmacKey should throw', t => {
   t.plan(1)
   t.assert.throws(() => new Tokens({ hmacKey: 123 }), new TypeError('option hmacKey must be a supported hmac key'))
