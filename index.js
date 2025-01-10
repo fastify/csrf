@@ -338,12 +338,10 @@ const PLUS_SLASH_GLOBAL_REGEXP = /[+/]/g
 function saltGenerator (saltLength) {
   const fnBody = []
 
-  fnBody.push('const base62 = \'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\'.split(\'\');')
-  fnBody.push('return function () {')
+  fnBody.push('const base62 = \'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\'.split(\'\');', 'return function () {')
   const salt = []
   for (let i = 0; i < saltLength; ++i) salt.push('base62[(62 * Math.random()) | 0]')
-  fnBody.push('return ' + salt.join('+'))
-  fnBody.push('}')
+  fnBody.push('return ' + salt.join('+'), '}')
   return new Function(fnBody.join(''))() // eslint-disable-line no-new-func
 }
 
