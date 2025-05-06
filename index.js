@@ -20,7 +20,6 @@ const crypto = require('node:crypto')
  * @param {boolean} [options.userInfo=false] Require userInfo on create() and verify()
  * @public
  */
-
 function Tokens (options) {
   if (!(this instanceof Tokens)) {
     return new Tokens(options)
@@ -43,7 +42,7 @@ function Tokens (options) {
     ? opts.saltLength
     : 8
 
-  if (typeof saltLength !== 'number' || !isFinite(saltLength) || saltLength < 1) {
+  if (typeof saltLength !== 'number' || !Number.isFinite(saltLength) || saltLength < 1) {
     throw new TypeError('option saltLength must be finite number > 1')
   }
 
@@ -51,7 +50,7 @@ function Tokens (options) {
     ? opts.secretLength
     : 18
 
-  if (typeof secretLength !== 'number' || !isFinite(secretLength) || secretLength < 1) {
+  if (typeof secretLength !== 'number' || !Number.isFinite(secretLength) || secretLength < 1) {
     throw new TypeError('option secretLength must be finite number > 1')
   }
 
@@ -59,7 +58,7 @@ function Tokens (options) {
     ? opts.validity
     : 0
 
-  if (typeof validity !== 'number' || !isFinite(validity) || validity < 0) {
+  if (typeof validity !== 'number' || !Number.isFinite(validity) || validity < 0) {
     throw new TypeError('option validity must be finite number > 0')
   }
 
