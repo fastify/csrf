@@ -19,27 +19,18 @@ new Tokens({ secretLength: 10 })
 new Tokens({ userInfo: true })
 new Tokens({ validity: 10000 })
 
-// @ts-expect-error!
-Tokens('secret')
-// @ts-expect-error!
-new Tokens('secret')
+expect(Tokens).type.not.toBeCallableWith('secret')
+expect(Tokens).type.not.toBeConstructableWith('secret')
 
-// @ts-expect-error!
-new Tokens({}).create('secret', 'userInfo')
-// @ts-expect-error!
-new Tokens({ userInfo: false }).create('secret', 'userInfo')
-// @ts-expect-error!
-new Tokens({ userInfo: true }).create('secret')
+expect(new Tokens({}).create).type.not.toBeCallableWith('secret', 'userInfo')
+expect(new Tokens({ userInfo: false }).create).type.not.toBeCallableWith('secret', 'userInfo')
+expect(new Tokens({ userInfo: true }).create).type.not.toBeCallableWith('secret')
 
-// @ts-expect-error!
-new Tokens({}).verify('secret', 'token', 'userinfo')
-// @ts-expect-error!
-new Tokens({ userInfo: false }).verify('secret', 'token', 'userInfo')
-// @ts-expect-error!
-new Tokens({ userInfo: true }).verify('secret', 'token')
+expect(new Tokens({}).verify).type.not.toBeCallableWith('secret', 'token', 'userinfo')
+expect(new Tokens({ userInfo: false }).verify).type.not.toBeCallableWith('secret', 'token', 'userInfo')
+expect(new Tokens({ userInfo: true }).verify).type.not.toBeCallableWith('secret', 'token')
 
-// @ts-expect-error!
-new Tokens({ hmacKey: 123 })
+expect(Tokens).type.not.toBeConstructableWith({ hmacKey: 123 })
 
 expect(Tokens().secret()).type.toBe<Promise<string>>()
 expect(new Tokens().secret()).type.toBe<Promise<string>>()
