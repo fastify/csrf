@@ -2,13 +2,13 @@
   "name": "@fastify/csrf",
   "description": "primary logic behind csrf tokens",
   "version": "8.0.1",
-  "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
+  "author": "Jonathan Ong <me@jongleberry.com> (https://jongleberry.com)",
   "main": "index.js",
   "type": "commonjs",
   "types": "types/index.d.ts",
   "contributors": [
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
-    "Matteo Collina <hello@matteocollina.com",
+    "Matteo Collina <hello@matteocollina.com>",
     {
       "name": "Manuel Spigolon",
       "email": "behemoth89@gmail.com"
