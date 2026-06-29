@@ -47,7 +47,7 @@
     "test:typescript": "tstyche"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.0.0",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
     "c8": "^11.0.0",
